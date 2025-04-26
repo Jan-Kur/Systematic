@@ -1,6 +1,7 @@
 # Systematic
 A mobile app made using RN and Expo. Live in the NOW, NOT tomorrow. Plan your life and follow systems to become consistent.
 
+
 ## The MVP of the app will consist of 3 main features:
 
 ### Timeline
