@@ -19,4 +19,6 @@ Writing your thoughts out daily is essential — and Systematic couldn't lack th
 ![image](https://github.com/user-attachments/assets/fe4c9637-b7d9-4267-868a-bd087bdce81d)
 
 ### Statistics
-Being able to see your progress is invaluable. The way it keeps people motivated and consistent is unmatched. Systematic will implement a system where every task you scheduled can be scored with "done", "kinda done" or "not done" so you can assess if the work you take on is doable - it's important not to live in your imagination and be productive *only* there, real progress happens in the real world.
+Being able to see your progress is invaluable. The way it keeps people motivated and consistent is unmatched. Systematic will implement a system where every task you scheduled can be scored with "done", "kinda done" or "not done" so you can assess if the work you take on is doable - it's important not to live in your imagination and be productive *only* there, real progress happens in the real world. You can also see statistics specific to different tasks to keep track of the improvements you make.
+
+![image](https://github.com/user-attachments/assets/93edb495-e17e-4c84-aeac-3b64cfc91765)
