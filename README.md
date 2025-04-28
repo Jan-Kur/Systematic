@@ -11,7 +11,7 @@ It's an endless scrollable timeline without strict division into days. Instead o
 
 When a task begins, the app will enter a **focus mode** with features specific to that task. You can assign them by choosing one of the premade tags or by creating your own and choosing what it should enable. The default focus mode will have a timer counting down till the end of the task and alarm you when the task ends so you can focus on the task itself and not the time - this helps in getting into that renowned *flow state*.
 
-![image](https://github.com/user-attachments/assets/79b8912d-7f82-45dc-9421-053af8b3d7a6)
+![image](https://github.com/user-attachments/assets/6a8c1c7b-1857-41d9-b976-ac2be4fd40ac)
 
 ### Journal
 Writing your thoughts out daily is essential — and Systematic couldn't lack that. The journaling experience is designed to be simple and seamless. But what's most important is the ability to view your past entries for every day, to see how your perception of the world changes and how you develop over time - that's the main focus with this journal.
