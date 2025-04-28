@@ -16,7 +16,7 @@ When a task begins, the app will enter a **focus mode** with features specific t
 ### Journal
 Writing your thoughts out daily is essential — and Systematic couldn't lack that. The journaling experience is designed to be simple and seamless. But what's most important is the ability to view your past entries for every day, to see how your perception of the world changes and how you develop over time - that's the main focus with this journal.
 
-![image](https://github.com/user-attachments/assets/d80a130a-550e-4d75-bfa1-be75588955ac)
+![image](https://github.com/user-attachments/assets/a49a9538-b65e-450f-828b-cec348428a08)
 
 ### Statistics
 Being able to see your progress is invaluable. The way it keeps people motivated and consistent is unmatched. Systematic will implement a system where every task you scheduled can be scored with "done", "kinda done" or "not done" so you can assess if the work you take on is doable - it's important not to live in your imagination and be productive *only* there, real progress happens in the real world.
