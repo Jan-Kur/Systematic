@@ -7,7 +7,7 @@ A mobile app made using RN and Expo. Live in the NOW, NOT tomorrow. Plan your li
 ### Timeline
 It's an endless scrollable timeline without strict division into days. Instead of procrastinating waiting for a "new day" or a "new week" to start fresh with your new habits, Systematic encourages you to take action *this moment*. If you had a bad day all day long, don't give up and spend the rest of it unproductively because "It's already a bad day" - *what happened before doesn't matter, you are here and now: every second, every moment is a new one*.
 
-![image](https://github.com/user-attachments/assets/5ea5732f-d92a-4c97-a004-e0725570bb5c)
+![image](https://github.com/user-attachments/assets/53b5a09e-2ca5-46d1-8368-e3b3330f34c2)
 
 When a task begins, the app will enter a **focus mode** with features specific to that task. You can assign them by choosing one of the premade tags or by creating your own and choosing what it should enable. The default focus mode will have a timer counting down till the end of the task and alarm you when the task ends so you can focus on the task itself and not the time - this helps in getting into that renowned *flow state*.
 
