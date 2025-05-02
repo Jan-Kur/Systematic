@@ -1,14 +1,12 @@
-import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
-import * as SplashScreen from 'expo-splash-screen';
-import { useEffect } from 'react';
 import "../global.css";
 
-SplashScreen.preventAutoHideAsync();
+
+//SplashScreen.preventAutoHideAsync();
 
 
 export default function RootLayout() {
-  const [loaded, error] = useFonts({
+  /*const [loaded, error] = useFonts({
     'Geist': require('@/fonts/Geist-Regular.ttf'),
   });
 
@@ -20,7 +18,11 @@ export default function RootLayout() {
 
   if (!loaded && !error) {
     return null;
-  }
+  }*/
 
-  return (<Stack/>)
+  return (
+    <Stack>
+      <Stack.Screen name="(tabs)" options={{headerShown: false}}/>
+    </Stack>
+    )
 }
