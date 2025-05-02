@@ -6,18 +6,18 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        background: {
-          dark: "#09080c",
-          DEFAULT: "#F6F5FF"
-        },
-        text: {
-          dark: "#09080c",
-          DEFAULT: "#F6F5FF"
-        },
+        lightMain: "#F6F5FF",
+        darkMain: "#08060A",
         primary: "#751FCC",
-      }
+        darkGray: "#202020",
+        lightGray: "#444444",
+      },
+      fontFamily: {
+        geist: ["Geist"],
+      },
     },
   },
   plugins: [],
 }
+
 
