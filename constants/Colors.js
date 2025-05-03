@@ -1,10 +1,14 @@
 export const Colors = {
     light: {
-        bg: "#F6F5FF",
+        main: "#F6F5FF",
         primary: "#751FCC",
+        darkGray: "#202020",
+        lightGray: "#444444",
     },
     dark: {
-        bg: "#09080c",
+        main: "#08060A",
         primary: "#751FCC",
+        darkGray: "#202020",
+        lightGray: "#444444",
     }
 }
