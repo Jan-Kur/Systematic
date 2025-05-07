@@ -13,20 +13,12 @@
       "bundleIdentifier": "com.xjaku.systematic"
     },
     "android": {
+      "softwareKeyboardLayoutMode": "pan",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.xjaku.systematic",
-      "softwareKeyboardLayoutMode": "resize",
-
-      
-      "androidStatusBar": {
-        "translucent": true
-      },
-      "androidNavigationBar": {
-        "visible": "sticky-immersive"
-      }
+      "package": "com.xjaku.systematic"
     },
     "web": {
       "bundler": "metro",

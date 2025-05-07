@@ -2,9 +2,8 @@ import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { useState } from 'react';
 import { Text, TouchableOpacity, View } from "react-native";
 
-export default function JournalCalendar() {
+export default function JournalCalendar({onDateSelect, journalEntries}) {
     const [date, setDate] = useState(new Date());
-    const [entryData, setEntryData] = useState({});
 
     function arrowLeft() {
         const newDate = new Date(date);
@@ -34,7 +33,7 @@ export default function JournalCalendar() {
         dayNumber: i,
         date: dateStr,
         isToday: dateStr === todayStr,
-        hasEntry: !!entryData[dateStr]?.hasEntry,
+        hasEntry: !!journalEntries[dateStr],
     });
     }
 
@@ -69,7 +68,9 @@ export default function JournalCalendar() {
             <View key={`spacer-${index}`} className="w-11 h-11 m-[5px] opacity-0"/>))}
             {days.map(day => {
                 return (
-                    <TouchableOpacity key={day.dayNumber} className={`${day.hasEntry ? "bg-primary" : "bg-lightGray"} rounded-xl ${day.isToday ? "border-2 border-[#AC40FF]" : ""} justify-center items-center w-11 h-11 m-[5px]`}>
+                    <TouchableOpacity onPress={() => {
+                        onDateSelect(day.date)
+                    }} key={day.dayNumber} className={`${day.hasEntry ? "bg-primary" : "bg-lightGray"} rounded-xl ${day.isToday ? "border-2 border-[#AC40FF]" : ""} justify-center items-center w-11 h-11 m-[5px]`}>
                         <Text className="text-lightMain text-xl font-semibold">{day.dayNumber}</Text>
                     </TouchableOpacity>
                 );
