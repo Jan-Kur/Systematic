@@ -2,6 +2,7 @@ import { useState } from "react";
 import { TextInput } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import DatePicker from "../../components/DatePicker";
+import ImprovementList from "../../components/ImprovementList";
 
 export default function Journal() {
   const [selectedDate, setSelectedDate] = useState(new Date().toLocaleDateString('sv-SE'))
@@ -30,6 +31,7 @@ export default function Journal() {
     <SafeAreaView className="bg-lightMain dark:bg-darkMain flex-1 flex-col justify-start gap-5 items-center px-4 py-3">
       <DatePicker selectedDate={selectedDate} updateSelectedDate={setSelectedDate} journalEntries={journalEntries}/>
       <JournalEntry content={ journalEntries[selectedDate] ? journalEntries[selectedDate].content : ""} onChangeText={onChangeText}/>
+      <ImprovementList/>
     </SafeAreaView>
   );
 }
@@ -47,5 +49,6 @@ function JournalEntry({content, onChangeText}) {
     />
   )
 };
+
 
   
