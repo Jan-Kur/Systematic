@@ -1,6 +1,6 @@
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
-import { useState } from "react";
-import { FlatList, Keyboard, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { useRef, useState } from "react";
+import { Animated, FlatList, Keyboard, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import BouncyCheckbox from "react-native-bouncy-checkbox";
 
 export default function ImprovementList() {
@@ -32,7 +32,7 @@ export default function ImprovementList() {
             )
         } else {
             return (
-                <UneditableItem content={item.content}/>
+                <UneditableItem content={item.content} id={item.id}/>
             )
         }
     }
@@ -48,7 +48,8 @@ export default function ImprovementList() {
         }
 
         return (
-            <View className="bg-white dark:bg-darkMain rounded-lg px-4 py-3 mb-2 shadow-sm border border-gray-300 w-full">
+            <View className="bg-white dark:bg-darkMain rounded-xl px-2 py-3 mb-2 shadow-sm border-2 border-primary w-full h-fit flex justify-center items-center">
+
                 <TextInput
                     value={value}
                     onChangeText={setValue}
@@ -56,39 +57,60 @@ export default function ImprovementList() {
                     placeholder="Enter improvement..."
                     placeholderTextColor="#A0A0A0"
                     autoFocus
-                    className="text-base text-darkMain dark:text-lightMain"
+                    className="text-base font-medium text-darkMain dark:text-lightMain w-full"
                     returnKeyType="done"
                 />
             </View>
         );
     }
 
-    function UneditableItem({ content }) {
+    function UneditableItem({ content, id }) {
+        
+        const fadeAnim = useRef(new Animated.Value(1)).current;
+        
+        function handleDelete() {
+            Animated.timing(fadeAnim, {
+            toValue: 0,
+            duration: 300,
+            useNativeDriver: true,
+            }).start(() => {
+            setImprovements(prev => prev.filter(item => item.id !== id));
+            });
+        }
+    
         return (
-            <View className="bg-darkGray dark:bg-gray-800 rounded-lg px-4 py-3 mb-2 flex-row items-center justify-between shadow-sm w-full">
-                <Text className="text-lightMain text-base flex-1">{content}</Text>
+            <Animated.View
+            style={{ opacity: fadeAnim }}
+            className="dark:bg-darkGray bg-violet-200 rounded-xl px-4 py-3 mb-3 flex-row items-center shadow-sm w-full min-h-[60] h-fit"
+            >
                 <BouncyCheckbox
                     size={24}
                     fillColor="#6A1FCC"
                     unfillColor="#FFFFFF"
                     iconStyle={{ borderColor: '#6A1FCC' }}
                     innerIconStyle={{ borderWidth: 2 }}
+                    onPress={checked => {
+                        if (checked) {
+                            handleDelete()
+                        } 
+                    }}
                 />
-            </View>
+                <View className="h-fit ml-[-325] flex-1">
+                    <Text numberOfLines={0} className="text-lg font-medium text-darkMain dark:text-lightMain">{content}</Text>
+                </View>
+            </Animated.View>
+            
         );
     }
 
     return (
-        <View className="flex-col items-center px-4 pt-2 w-full bg-white dark:bg-black">
+        <View className="flex-col items-center pt-2 w-full bg-transparent">
             <FlatList
                 data={improvements}
                 renderItem={renderItem}
                 keyExtractor={(item) => item.id}
                 className="w-full"
                 scrollEnabled={true}
-                contentContainerStyle={{
-                    paddingBottom: 16,
-                }}
                 ListEmptyComponent={
                     <Text className="text-gray-400 text-center py-4">
                         No improvements yet.
