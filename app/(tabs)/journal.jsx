@@ -28,7 +28,7 @@ export default function Journal() {
   
 
   return (
-    <SafeAreaView className="bg-lightMain dark:bg-darkMain flex-1 flex-col justify-start gap-5 items-center px-4 py-3">
+    <SafeAreaView className="bg-lightMain dark:bg-darkMain flex-1 flex-col justify-start gap-5 items-center px-4 py-2">
       <DatePicker selectedDate={selectedDate} updateSelectedDate={setSelectedDate} journalEntries={journalEntries}/>
       <JournalEntry content={ journalEntries[selectedDate] ? journalEntries[selectedDate].content : ""} onChangeText={onChangeText}/>
       <ImprovementList/>

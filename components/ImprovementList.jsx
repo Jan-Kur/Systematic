@@ -7,14 +7,22 @@ export default function ImprovementList() {
     const [improvements, setImprovements] = useState([])
 
     function addImprovement() {
-        setImprovements(prev => ([
-        ...prev,
-        {
-            id: Math.random().toString(36).slice(2, 11),
-            content: "",
-            editing: true
-        }
-      ]))
+        setImprovements(prev => {
+            const updated = [
+                ...prev,
+                {
+                    id: Math.random().toString(36).slice(2, 11),
+                    content: "",
+                    editing: true
+                }
+            ];
+
+            setTimeout(() => {
+                flatListRef.current?.scrollToEnd({ animated: true });
+            }, 0);
+
+            return updated;
+        });
     }
 
     function updateImprovementContent(id, newContent) {
@@ -37,6 +45,15 @@ export default function ImprovementList() {
         }
     }
 
+    function SeparatorItem() {
+        return (
+            <>
+                <View className="w-full bg-transparent h-[5] self-center"/>
+                <View className="w-full bg-transparent h-[5] self-center"/>
+            </>
+            
+        )
+    }
     function EditableItem({ id, onSubmit }) {
         const [value, setValue] = useState("");
 
@@ -48,7 +65,7 @@ export default function ImprovementList() {
         }
 
         return (
-            <View className="bg-white dark:bg-darkMain rounded-xl px-2 py-3 mb-2 shadow-sm border-2 border-primary w-full h-fit flex justify-center items-center">
+            <View className="bg-transparent rounded-xl px-2 py-3 shadow-sm border-2 border-primary w-full h-fit flex justify-center items-center">
 
                 <TextInput
                     value={value}
@@ -81,7 +98,7 @@ export default function ImprovementList() {
         return (
             <Animated.View
             style={{ opacity: fadeAnim }}
-            className="dark:bg-darkGray bg-violet-200 rounded-xl px-4 py-3 mb-3 flex-row items-center shadow-sm w-full min-h-[60] h-fit"
+            className="bg-darkGray rounded-xl px-4 py-3 flex-row items-center shadow-sm w-full min-h-[50] h-fit"
             >
                 <BouncyCheckbox
                     size={24}
@@ -103,24 +120,29 @@ export default function ImprovementList() {
         );
     }
 
+    const flatListRef = useRef(null);
+
     return (
-        <View className="flex-col items-center pt-2 w-full bg-transparent">
+        <View className="flex-col flex-1 items-center pt-2 w-full bg-transparent">
             <FlatList
                 data={improvements}
                 renderItem={renderItem}
                 keyExtractor={(item) => item.id}
+                ref={flatListRef}
                 className="w-full"
                 scrollEnabled={true}
+                showsVerticalScrollIndicator={false}
+                ItemSeparatorComponent={SeparatorItem}
                 ListEmptyComponent={
                     <Text className="text-gray-400 text-center py-4">
-                        No improvements yet.
+                        No improvements yet
                     </Text>
                 }
             />
 
             <TouchableOpacity
                 onPress={addImprovement}
-                className="bg-darkGray px-4 py-1 mt-2 rounded-lg shadow-md"
+                className="bg-darkGray px-4 py-1 mt-3 rounded-lg shadow-md"
             >
                 <FontAwesome6 name="plus" size={24} color="#6A1FCC" />
             </TouchableOpacity>
