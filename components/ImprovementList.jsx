@@ -111,10 +111,8 @@ export default function ImprovementList() {
                             handleDelete()
                         } 
                     }}
+                    textComponent={<Text numberOfLines={0} className="text-lg font-medium text-darkMain dark:text-lightMain px-3">{content}</Text>}
                 />
-                <View className="h-fit ml-[-325] flex-1">
-                    <Text numberOfLines={0} className="text-lg font-medium text-darkMain dark:text-lightMain">{content}</Text>
-                </View>
             </Animated.View>
             
         );
