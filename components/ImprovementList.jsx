@@ -1,10 +1,32 @@
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
-import { useRef, useState } from "react";
+import firestore from '@react-native-firebase/firestore';
+import { useEffect, useRef, useState } from "react";
 import { Animated, FlatList, Keyboard, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import BouncyCheckbox from "react-native-bouncy-checkbox";
 
 export default function ImprovementList() {
+    const userId = "CeFWuhSTQRIpQTMq8cQ6";
+
     const [improvements, setImprovements] = useState([])
+
+    useEffect(() => {
+        const fetchImprovements = async () => {
+            const snapshot = await firestore()
+            .collection('users')
+            .doc(userId)
+            .collection('improvements')
+            .get();
+
+            const data = snapshot.docs.map(doc => ({
+                id: doc.id,
+                content: doc.data().content,
+                editing: false
+            }));
+            setImprovements(data);
+        };
+
+        fetchImprovements();
+    }, []);
 
     function addImprovement() {
         setImprovements(prev => {
@@ -25,13 +47,26 @@ export default function ImprovementList() {
         });
     }
 
-    function updateImprovementContent(id, newContent) {
-        setImprovements(prev => 
-            prev.map(item => 
-                item.id === id ? { ...item, content: newContent, editing: false } : item
+    async function updateImprovementContent(tempId, newContent) {
+        const docRef = await firestore()
+            .collection('users')
+            .doc(userId)
+            .collection('improvements')
+            .add({ content: newContent });
+
+        const newItem = {
+            id: docRef.id,
+            content: newContent,
+            editing: false
+        };
+
+        setImprovements(prev =>
+            prev.map(item =>
+            item.id === tempId ? newItem : item
             )
-        )
+        );
     }
+
 
     function renderItem({item}) {
         if (item.editing) {
@@ -91,8 +126,10 @@ export default function ImprovementList() {
             duration: 300,
             useNativeDriver: true,
             }).start(() => {
-            setImprovements(prev => prev.filter(item => item.id !== id));
+                setImprovements(prev => prev.filter(item => item.id !== id));
+                firestore().collection('users').doc(userId).collection('improvements').doc(id).delete();
             });
+            
         }
     
         return (
