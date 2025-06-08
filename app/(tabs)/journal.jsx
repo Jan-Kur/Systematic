@@ -5,6 +5,20 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import DatePicker from "../../components/DatePicker";
 import ImprovementList from "../../components/ImprovementList";
 
+function JournalEntry({content, onChangeText}) {
+  return(
+    <TextInput 
+      multiline
+      value={content}
+      onChangeText={onChangeText} 
+      numberOfLines={10}  
+      style={{ textAlignVertical: 'top' }}
+      cursorColor="#6A1FCC"
+      className="border-2 border-lightGray bg-darkGray color-lightMain text-lg font-medium rounded-2xl w-full h-2/5"
+    />
+  )
+};
+
 export default function Journal() {
   const userId = "CeFWuhSTQRIpQTMq8cQ6";
 
@@ -37,55 +51,51 @@ export default function Journal() {
 
   useEffect(() => {
     lastSavedContent.current = journalEntries[selectedDate]?.content || '';
-  }, [selectedDate, journalEntries])
+  }, [selectedDate])
+   
+   function onChangeText(content) {
+    const currentDate = selectedDate;
 
-  function onChangeText(content) {
-    if (content === "") {
-      setJournalEntries(prev => {
+    setJournalEntries(prev => {
         const newEntries = { ...prev };
-        delete newEntries[selectedDate];
-        return newEntries;
-      });
-    } else {
-      setJournalEntries(prev => ({
-        ...prev,
-        [selectedDate]: {
-          content,
+        if (content === "") {
+            delete newEntries[currentDate];
+        } else {
+            newEntries[currentDate] = { content };
         }
-      }));
-    }
+        return newEntries;
+    });
 
     if (debounceTimer.current) {
-      clearTimeout(debounceTimer.current);
+        clearTimeout(debounceTimer.current);
     }
 
     debounceTimer.current = setTimeout(async () => {
-      if (content !== lastSavedContent.current) {
-        try {
-          if (content === "") {
-            await firestore()
-              .collection('users')
-              .doc(userId)
-              .collection('journalEntries')
-              .doc(selectedDate)
-              .delete();
-            console.log("Deleted entry for", selectedDate);
-          } else {
-            await firestore()
-              .collection('users')
-              .doc(userId)
-              .collection('journalEntries')
-              .doc(selectedDate)
-              .set({ content }, { merge: true });
-            console.log("Saved entry for", selectedDate, ":", content.substring(0, 50) + "...");
-          }
-          lastSavedContent.current = content;
-        } catch (error) {
-          console.error("Failed to save journal entry:", error);
+        const lastContent = lastSavedContent.current;
+        const latestContent = content; 
+
+        if (latestContent !== lastContent) {
+            try {
+                const entryRef = firestore()
+                    .collection('users')
+                    .doc(userId)
+                    .collection('journalEntries')
+                    .doc(currentDate);
+
+                if (latestContent === "") {
+                    await entryRef.delete();
+                    console.log("Deleted entry for", currentDate);
+                } else {
+                    await entryRef.set({ content: latestContent }, { merge: true });
+                    console.log("Saved entry for", currentDate, ":", latestContent.substring(0, 50) + "...");
+                }
+                lastSavedContent.current = latestContent;
+            } catch (error) {
+                console.error("Failed to save journal entry:", error);
+            }
         }
-      }
     }, 1200);
-  }
+   }
 
   const ContainerComponent = Platform.OS === 'web' ? View : SafeAreaView;
 
@@ -97,20 +107,6 @@ export default function Journal() {
     </ContainerComponent>
   );
 }
-
-function JournalEntry({content, onChangeText}) {
-  return(
-    <TextInput 
-      multiline
-      value={content}
-      onChangeText={onChangeText} 
-      numberOfLines={10}  
-      style={{ textAlignVertical: 'top' }}
-      cursorColor="#6A1FCC"
-      className="border-2 border-lightGray bg-darkGray color-lightMain text-lg font-medium rounded-2xl w-full h-2/5"
-    />
-  )
-};
 
 
   
