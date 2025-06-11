@@ -1,186 +1,183 @@
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
-import firestore from '@react-native-firebase/firestore';
+import { addDoc, collection, deleteDoc, doc, getDocs, getFirestore } from '@react-native-firebase/firestore';
 import { useEffect, useRef, useState } from "react";
 import { Animated, FlatList, Keyboard, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import BouncyCheckbox from "react-native-bouncy-checkbox";
 
 export default function ImprovementList() {
-    const userId = "CeFWuhSTQRIpQTMq8cQ6";
+   const db = getFirestore();
 
-    const [improvements, setImprovements] = useState([])
+   const userId = "CeFWuhSTQRIpQTMq8cQ6";
 
-    useEffect(() => {
-        const fetchImprovements = async () => {
-            const snapshot = await firestore()
-            .collection('users')
-            .doc(userId)
-            .collection('improvements')
-            .get();
+   const [improvements, setImprovements] = useState([])
 
-            const data = snapshot.docs.map(doc => ({
-                id: doc.id,
-                content: doc.data().content,
-                editing: false
-            }));
-            setImprovements(data);
-        };
+   useEffect(() => {
+      const fetchImprovements = async () => {
 
-        fetchImprovements();
-    }, []);
+         const snapshot = await getDocs(collection(db, `users/${userId}/improvements`))
 
-    function addImprovement() {
-        setImprovements(prev => {
-            const updated = [
-                ...prev,
-                {
-                    id: Math.random().toString(36).slice(2, 11),
-                    content: "",
-                    editing: true
-                }
-            ];
+         const data = snapshot.docs.map(doc => ({
+               id: doc.id,
+               content: doc.data().content,
+               editing: false
+         }));
+         setImprovements(data);
+      };
 
-            setTimeout(() => {
-                flatListRef.current?.scrollToEnd({ animated: true });
-            }, 0);
+      fetchImprovements();
+   }, []);
 
-            return updated;
-        });
-    }
+   function addImprovement() {
+      setImprovements(prev => {
+         const updated = [
+               ...prev,
+               {
+                  id: Math.random().toString(36).slice(2, 11),
+                  content: "",
+                  editing: true
+               }
+         ];
 
-    async function updateImprovementContent(tempId, newContent) {
-        const docRef = await firestore()
-            .collection('users')
-            .doc(userId)
-            .collection('improvements')
-            .add({ content: newContent });
+         setTimeout(() => {
+               flatListRef.current?.scrollToEnd({ animated: true });
+         }, 0);
 
-        const newItem = {
-            id: docRef.id,
-            content: newContent,
-            editing: false
-        };
+         return updated;
+      });
+   }
 
-        setImprovements(prev =>
-            prev.map(item =>
-            item.id === tempId ? newItem : item
-            )
-        );
-    }
+   async function updateImprovementContent(tempId, newContent) {
+
+      const docRef = await addDoc(collection(db, `users/${userId}/improvements`), {content: newContent})
+
+      const newItem = {
+         id: docRef.id,
+         content: newContent,
+         editing: false
+      };
+
+      setImprovements(prev =>
+         prev.map(item =>
+         item.id === tempId ? newItem : item
+         )
+      );
+   }
 
 
-    function renderItem({item}) {
-        if (item.editing) {
-            return (
-                <EditableItem id={item.id} onSubmit={updateImprovementContent}/>
-            )
-        } else {
-            return (
-                <UneditableItem content={item.content} id={item.id}/>
-            )
-        }
-    }
+   function renderItem({item}) {
+      if (item.editing) {
+         return (
+               <EditableItem id={item.id} onSubmit={updateImprovementContent}/>
+         )
+      } else {
+         return (
+               <UneditableItem content={item.content} id={item.id}/>
+         )
+      }
+   }
 
-    function SeparatorItem() {
-        return (
-            <>
-                <View className="w-full bg-transparent h-[5] self-center"/>
-                <View className="w-full bg-transparent h-[5] self-center"/>
-            </>
-            
-        )
-    }
-    function EditableItem({ id, onSubmit }) {
-        const [value, setValue] = useState("");
+   function SeparatorItem() {
+      return (
+         <>
+               <View className="w-full bg-transparent h-[5] self-center"/>
+               <View className="w-full bg-transparent h-[5] self-center"/>
+         </>
+         
+      )
+   }
+   function EditableItem({ id, onSubmit }) {
+      const [value, setValue] = useState("");
 
-        function handleSubmitEditing() {
-            if (value.trim()) {
-                onSubmit(id, value.trim());
-                Keyboard.dismiss();
-            }
-        }
+      function handleSubmitEditing() {
+         if (value.trim()) {
+               onSubmit(id, value.trim());
+               Keyboard.dismiss();
+         }
+      }
 
-        return (
-            <View className="bg-transparent rounded-xl px-2 py-3 shadow-sm border-2 border-primary w-full h-fit flex justify-center items-center">
+      return (
+         <View className="bg-transparent rounded-xl px-2 py-3 shadow-sm border-2 border-primary w-full h-fit flex justify-center items-center">
 
-                <TextInput
-                    value={value}
-                    onChangeText={setValue}
-                    onSubmitEditing={handleSubmitEditing}
-                    placeholder="Enter improvement..."
-                    placeholderTextColor="#A0A0A0"
-                    autoFocus
-                    className="text-base font-medium text-darkMain dark:text-lightMain w-full"
-                    returnKeyType="done"
-                />
-            </View>
-        );
-    }
+               <TextInput
+                  value={value}
+                  onChangeText={setValue}
+                  onSubmitEditing={handleSubmitEditing}
+                  placeholder="Enter improvement..."
+                  placeholderTextColor="#A0A0A0"
+                  autoFocus
+                  className="text-base font-medium text-darkMain dark:text-lightMain w-full"
+                  returnKeyType="done"
+               />
+         </View>
+      );
+   }
 
-    function UneditableItem({ content, id }) {
-        
-        const fadeAnim = useRef(new Animated.Value(1)).current;
-        
-        function handleDelete() {
-            Animated.timing(fadeAnim, {
-            toValue: 0,
-            duration: 300,
-            useNativeDriver: true,
-            }).start(() => {
-                setImprovements(prev => prev.filter(item => item.id !== id));
-                firestore().collection('users').doc(userId).collection('improvements').doc(id).delete();
-            });
-            
-        }
-    
-        return (
-            <Animated.View
-            style={{ opacity: fadeAnim }}
-            className="bg-darkGray rounded-xl px-4 py-3 flex-row items-center shadow-sm w-full min-h-[50] h-fit"
-            >
-                <BouncyCheckbox
-                    size={24}
-                    fillColor="#6A1FCC"
-                    unfillColor="#FFFFFF"
-                    iconStyle={{ borderColor: '#6A1FCC' }}
-                    innerIconStyle={{ borderWidth: 2 }}
-                    onPress={checked => {
-                        if (checked) {
-                            handleDelete()
-                        } 
-                    }}
-                    textComponent={<Text numberOfLines={0} className="text-lg font-medium text-darkMain dark:text-lightMain px-3">{content}</Text>}
-                />
-            </Animated.View>
-            
-        );
-    }
+   function UneditableItem({ content, id }) {
+      
+      const fadeAnim = useRef(new Animated.Value(1)).current;
+      
+      function handleDelete() {
+         Animated.timing(fadeAnim, {
+         toValue: 0,
+         duration: 300,
+         useNativeDriver: true,
+         }).start(() => {
+               setImprovements(prev => prev.filter(item => item.id !== id));
+               deleteDoc(doc(db, `users/${userId}/improvements/${id}`))
 
-    const flatListRef = useRef(null);
+         });
+         
+      }
+   
+      return (
+         <Animated.View
+         style={{ opacity: fadeAnim }}
+         className="bg-darkGray rounded-xl px-4 py-3 flex-row items-center shadow-sm w-full min-h-[50] h-fit"
+         >
+               <BouncyCheckbox
+                  size={24}
+                  fillColor="#6A1FCC"
+                  unfillColor="#FFFFFF"
+                  iconStyle={{ borderColor: '#6A1FCC' }}
+                  innerIconStyle={{ borderWidth: 2 }}
+                  onPress={checked => {
+                     if (checked) {
+                           handleDelete()
+                     } 
+                  }}
+                  textComponent={<Text numberOfLines={0} className="text-lg font-medium text-darkMain dark:text-lightMain px-3">{content}</Text>}
+               />
+         </Animated.View>
+         
+      );
+   }
 
-    return (
-        <View className="flex-col flex-1 items-center pt-2 w-full bg-transparent">
-            <FlatList
-                data={improvements}
-                renderItem={renderItem}
-                keyExtractor={(item) => item.id}
-                ref={flatListRef}
-                className="w-full"
-                scrollEnabled={true}
-                showsVerticalScrollIndicator={false}
-                ItemSeparatorComponent={SeparatorItem}
-                ListEmptyComponent={
-                    <Text className="text-gray-400 text-center py-4">
-                        No improvements yet
-                    </Text>
-                }
-            />
+   const flatListRef = useRef(null);
 
-            <TouchableOpacity
-                onPress={addImprovement}
-                className="bg-darkGray px-4 py-1 mt-3 rounded-lg shadow-md"
-            >
-                <FontAwesome6 name="plus" size={24} color="#6A1FCC" />
-            </TouchableOpacity>
-        </View>       
-    )
+   return (
+      <View className="flex-col flex-1 items-center pt-2 w-full bg-transparent">
+         <FlatList
+               data={improvements}
+               renderItem={renderItem}
+               keyExtractor={(item) => item.id}
+               ref={flatListRef}
+               className="w-full"
+               scrollEnabled={true}
+               showsVerticalScrollIndicator={false}
+               ItemSeparatorComponent={SeparatorItem}
+               ListEmptyComponent={
+                  <Text className="text-gray-400 text-center py-4">
+                     No improvements yet
+                  </Text>
+               }
+         />
+
+         <TouchableOpacity
+               onPress={addImprovement}
+               className="bg-darkGray px-4 py-1 mt-3 rounded-lg shadow-md"
+         >
+               <FontAwesome6 name="plus" size={24} color="#6A1FCC" />
+         </TouchableOpacity>
+      </View>       
+   )
 }
