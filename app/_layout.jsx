@@ -1,8 +1,9 @@
 import Colors from '@/constants/Colors';
+import { SessionProvider, useSession } from '@/contexts/AuthContext';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import * as SystemUI from 'expo-system-ui';
-import { useColorScheme } from 'react-native';
+import { ActivityIndicator, useColorScheme, View } from 'react-native';
 import "../global.css";
 
 
@@ -15,12 +16,46 @@ export default function RootLayout() {
   SystemUI.setBackgroundColorAsync(statusBarBackgroundColor);
 
   return (
-    <>
+   <SessionProvider>
       <StatusBar
         backgroundColor={statusBarBackgroundColor}
         style={statusBarStyle}
       />
-      <Stack screenOptions={{ headerShown: false }} />
-    </>
+      <RootNavigator/>
+   </SessionProvider>
   );
+}
+
+function RootNavigator() {
+   const { session, isLoading } = useSession();
+
+   if (isLoading) {
+     return (
+       <View style={{ 
+         flex: 1, 
+         justifyContent: 'center', 
+         alignItems: 'center',
+         backgroundColor: Colors.light.main
+       }}>
+         <ActivityIndicator size="large" color={Colors.light.primary} />
+       </View>
+     );
+   }
+
+   return (
+      <Stack screenOptions={{ headerShown: false }}>
+         <Stack.Screen
+            name="(tabs)"
+            options={{
+              redirect: !session,
+            }}
+          />
+          <Stack.Screen
+            name="(auth)"
+            options={{
+              redirect: !!session,
+            }}
+          />
+      </Stack>
+   );
 }
