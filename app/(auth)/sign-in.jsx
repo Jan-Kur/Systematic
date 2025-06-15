@@ -1,3 +1,4 @@
+import { Link } from "expo-router";
 import { useState } from "react";
 import { Platform, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -14,6 +15,23 @@ export default function SignIn() {
    
    return (
       <ContainerComponent className="bg-lightMain dark:bg-darkMain flex-1 flex-col justify-start gap-3 items-center pl-4 pr-4 pt-2 pb-2">
+         <View className="flex-row gap-2 w-full h-fit">
+            <TouchableOpacity className="flex-1 bg-transparent shadow-darkMain dark:shadow-lightMain rounded-xl border-2 border-gray-200 dark:border-gray-950 p-2">
+               <Image
+                  source={require('../../images/googleLogo')}
+                  style={{ width: 24, height: 24 }}
+                  resizeMode="contain"
+               />
+            </TouchableOpacity>
+            <TouchableOpacity className="flex-1 bg-transparent shadow-darkMain dark:shadow-lightMain rounded-xl border-2 border-gray-200 dark:border-gray-950 p-2">
+               <Image
+                  source={require('../../images/githubLogo.png')}
+                  style={{ width: 24, height: 24 }}
+                  resizeMode="contain"
+               />
+            </TouchableOpacity>
+         </View>
+         
          <View className="flex-row gap-2">
             <View className="flex-1 h-[2] rounded-full bg-lightGray"/>
             <Text className="text-base color-lightGray font-medium">or</Text>
@@ -62,6 +80,12 @@ export default function SignIn() {
          >
             <Text className="text-2xl color-darkMain dark:color-lightMain font-semibold">Sign in</Text>
          </TouchableOpacity>
+         <View className="flex-row gap-1">
+            <Text className="text-base color-lightGray font-medium">Don't have an account?</Text>
+            <Link href="/register">
+               <Text className="text-base color-primary font-medium">Create account</Text>
+            </Link>
+         </View>
       </ContainerComponent>
    );
 }
