@@ -27,7 +27,7 @@ export default function RootLayout() {
 }
 
 function RootNavigator() {
-   const { session, isLoading } = useSession();
+   const { user, isLoading } = useSession();
 
    if (isLoading) {
      return (
@@ -47,13 +47,13 @@ function RootNavigator() {
          <Stack.Screen
             name="(tabs)"
             options={{
-              redirect: !session,
+              redirect: !user,
             }}
           />
           <Stack.Screen
             name="(auth)"
             options={{
-              redirect: !!session,
+              redirect: !!user,
             }}
           />
       </Stack>

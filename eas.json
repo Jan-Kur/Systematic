@@ -5,9 +5,6 @@
   },
   "build": {
     "development": {
-      "env": {
-         "GITHUB_CLIENT_ID":"Ov23liuCod7FJ3075bq3"
-      },
       "developmentClient": true,
       "distribution": "internal",
       "android": {
@@ -34,9 +31,6 @@
       }
     },
     "production": {
-      "env": {
-         "GITHUB_CLIENT_ID":"Ov23liuCod7FJ3075bq3"
-      },
       "channel": "production",
       "autoIncrement": true,
       "android": {
