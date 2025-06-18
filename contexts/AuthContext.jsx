@@ -1,10 +1,7 @@
 import { createUserWithEmailAndPassword, getAuth, GithubAuthProvider, GoogleAuthProvider, onAuthStateChanged, signInWithCredential, signInWithEmailAndPassword, signOut } from '@react-native-firebase/auth';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { makeRedirectUri, useAuthRequest } from 'expo-auth-session';
-import { maybeCompleteAuthSession } from 'expo-web-browser';
 import React, { createContext, useContext, useEffect, useState } from 'react';
-
-maybeCompleteAuthSession();
 
 const AuthContext = createContext({
    user: null,
@@ -54,7 +51,8 @@ export function SessionProvider({ children }) {
    }, [response]);
 
    useEffect(() => {
-      const subscriber = onAuthStateChanged((authenticatedUser) => {
+      signOut(getAuth())//FOR DEBUGGING
+      const subscriber = onAuthStateChanged(getAuth(), authenticatedUser => {
          setUser(authenticatedUser);
          setIsLoading(false);
       });

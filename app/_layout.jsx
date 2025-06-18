@@ -44,18 +44,11 @@ function RootNavigator() {
 
    return (
       <Stack screenOptions={{ headerShown: false }}>
-         <Stack.Screen
-            name="(tabs)"
-            options={{
-              redirect: !user,
-            }}
-          />
-          <Stack.Screen
-            name="(auth)"
-            options={{
-              redirect: !!user,
-            }}
-          />
+         {user ? (
+            <Stack.Screen name="(tabs)" />
+         ) : (
+            <Stack.Screen name="(auth)" />
+         )}
       </Stack>
    );
 }

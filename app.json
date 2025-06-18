@@ -45,8 +45,7 @@
         }
       ],
       "expo-font",
-      "expo-system-ui",
-      "expo-secure-store"
+      "expo-system-ui"
     ],
     "experiments": {
       "typedRoutes": true
