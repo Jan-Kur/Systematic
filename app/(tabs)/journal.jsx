@@ -4,6 +4,7 @@ import { Platform, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import DatePicker from "../../components/DatePicker";
 import ImprovementList from "../../components/ImprovementList";
+import { useSession } from "../../contexts/AuthContext";
 
 function JournalEntry({content, onChangeText}) {
   return(
@@ -22,7 +23,8 @@ function JournalEntry({content, onChangeText}) {
 export default function Journal() {
    const db = getFirestore()
 
-   const userId = "CeFWuhSTQRIpQTMq8cQ6";
+   const {user} = useSession();
+   const userId = user.uid;
 
    const [selectedDate, setSelectedDate] = useState(new Date().toLocaleDateString('sv-SE'))
    const [journalEntries, setJournalEntries] = useState({})

@@ -3,11 +3,13 @@ import { addDoc, collection, deleteDoc, doc, getDocs, getFirestore } from '@reac
 import { useEffect, useRef, useState } from "react";
 import { Animated, FlatList, Keyboard, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import BouncyCheckbox from "react-native-bouncy-checkbox";
+import { useSession } from '../contexts/AuthContext';
 
 export default function ImprovementList() {
    const db = getFirestore();
 
-   const userId = "CeFWuhSTQRIpQTMq8cQ6";
+   const {user} = useSession()
+   const userId = user.uid
 
    const [improvements, setImprovements] = useState([])
 

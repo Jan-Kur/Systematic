@@ -44,11 +44,13 @@ function RootNavigator() {
 
    return (
       <Stack screenOptions={{ headerShown: false }}>
-         {user ? (
+         <Stack.Protected guard={user}>
             <Stack.Screen name="(tabs)" />
-         ) : (
+         </Stack.Protected>
+
+         <Stack.Protected guard={!user}>
             <Stack.Screen name="(auth)" />
-         )}
+         </Stack.Protected>
       </Stack>
    );
 }

@@ -14,11 +14,11 @@ export default function Index() {
          <View className="w-8 h-8 p-3 bg-darkGray">
             <View className="w-full h-full bg-lightGray"></View>
          </View>
-         <TouchableOpacity className="color-primary" 
+         <TouchableOpacity className="bg-primary w-fit h-fit p-2" 
          onPress={async () => {
             await signOut()
          }}>
-            <Text>Sign out</Text>
+            <Text className="text-xl">Sign out</Text>
          </TouchableOpacity>
       </ContainerComponent>
       
