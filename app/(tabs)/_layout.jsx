@@ -1,9 +1,9 @@
-import { useSession } from '@/contexts/AuthContext';
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { Redirect, Tabs } from "expo-router";
 import { useColorScheme } from 'react-native';
+import { useSession } from '../../contexts/AuthContext';
 
 export default function TabLayout() {
    const { user, isLoading } = useSession();

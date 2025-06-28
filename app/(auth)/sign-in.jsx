@@ -6,6 +6,7 @@ import { useSession } from '../../contexts/AuthContext';
 
 
 export default function SignIn() {
+   
    const {signInWithEmail, signInWithGitHub, signInWithGoogle, user} = useSession()
    const colorScheme = useColorScheme();
    const ContainerComponent = Platform.OS === 'web' ? View : SafeAreaView

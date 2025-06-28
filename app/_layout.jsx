@@ -1,9 +1,9 @@
-import Colors from '@/constants/Colors';
-import { SessionProvider, useSession } from '@/contexts/AuthContext';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import * as SystemUI from 'expo-system-ui';
 import { ActivityIndicator, useColorScheme, View } from 'react-native';
+import Colors from '../constants/Colors';
+import { SessionProvider, useSession } from '../contexts/AuthContext';
 import "../global.css";
 
 

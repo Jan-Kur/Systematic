@@ -1,10 +1,10 @@
-import { createUserWithEmailAndPassword, getAuth, GithubAuthProvider, GoogleAuthProvider, onAuthStateChanged, signInWithCredential, signInWithEmailAndPassword, signOut } from '@react-native-firebase/auth';
+import { createUserWithEmailAndPassword, getAdditionalUserInfo, getAuth, GithubAuthProvider, GoogleAuthProvider, onAuthStateChanged, signInWithCredential, signInWithEmailAndPassword, signOut } from '@react-native-firebase/auth';
 import { doc, getFirestore, serverTimestamp, setDoc } from "@react-native-firebase/firestore";
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { makeRedirectUri, useAuthRequest } from 'expo-auth-session';
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
 
-const db = getFirestore()
+const db = getFirestore();
 
 const AuthContext = createContext({
    user: null,
@@ -27,8 +27,12 @@ export function useSession() {
 }
 
 export function SessionProvider({ children }) {
+
    const [user, setUser] = useState(null);
    const [isLoading, setIsLoading] = useState(true);
+   const [isGitHubLoading, setIsGitHubLoading] = useState(false);
+
+   const GITHUB_CLIENT_ID = "Ov23liuCod7FJ3075bq3";
 
    const discovery = {
       authorizationEndpoint: 'https://github.com/login/oauth/authorize',
@@ -37,14 +41,14 @@ export function SessionProvider({ children }) {
 
    const [request, response, promptAsync] = useAuthRequest(
       {
-         clientId: process.env.GITHUB_CLIENT_ID,
+         clientId: GITHUB_CLIENT_ID,
          scopes: ['user:email'],
          redirectUri: makeRedirectUri({
             scheme: 'com.xjaku.systematic',
             path: 'auth',
          }),
       },
-      discovery
+      discovery,
    );
 
    useEffect(() => {
@@ -54,54 +58,65 @@ export function SessionProvider({ children }) {
    }, [response]);
 
    useEffect(() => {
-      signOut(getAuth())//FOR DEBUGGING
-      const subscriber = onAuthStateChanged(getAuth(), authenticatedUser => {
-         setUser(authenticatedUser);
-         setIsLoading(false);
-      });
-      
+         const subscriber = onAuthStateChanged(getAuth(), async (authenticatedUser) => {
+            setUser(authenticatedUser);
+            setIsLoading(false);
+         });
+
       return subscriber; 
    }, []);
 
    const handleGitHubCallback = async (code) => {
+
+      if (isGitHubLoading) return;
+      setIsGitHubLoading(true);
+
       try {
-         const tokenResponse = await fetch('https://github.com/login/oauth/access_token', {
+         const response = await fetch('https://systematic-jvtxt9gx6-jan-kurs-projects.vercel.app/api/exchange-github-token', {
             method: 'POST',
             headers: {
-               'Accept': 'application/json',
                'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-               client_id: process.env.GITHUB_CLIENT_ID,
-               client_secret: process.env.GITHUB_CLIENT_SECRET,
-               code: code,
+               code,
+               clientId: GITHUB_CLIENT_ID,
             }),
          });
+         const data = await response.json();
 
-         const tokenData = await tokenResponse.json();
-         
-         if (tokenData.error) {
-            throw new Error(tokenData.error_description || 'Failed to get access token');
+         if (!data.access_token) {
+            throw new Error('No access token received from GitHub');
          }
 
-         const githubCredential = GithubAuthProvider.credential(tokenData.access_token);
-         
-         await signInWithCredential(getAuth(), githubCredential);
-         
+         const githubCredential = GithubAuthProvider.credential(data.access_token);
+
+         const userCredential = await signInWithCredential(getAuth(), githubCredential);
+         const isNewUser = getAdditionalUserInfo(userCredential).isNewUser;
+
+         if (isNewUser) {
+               await setDoc(doc(db, 'users', userCredential.user.uid), {
+                  email: userCredential.user.email || null,
+                  createdAt: serverTimestamp(),
+               });
+            }
+
       } catch (error) {
          console.error('GitHub OAuth callback error:', error);
-         alert('GitHub authentication failed: ' + error.message);//add crashlitics here
+         alert('GitHub authentication failed: ' + error.message);
+      } finally {
+         setIsGitHubLoading(false);
       }
    };
 
    const value = {
       user,
       isLoading,
+      isGitHubLoading,
       signInWithEmail: async (email, password) => {
          try {
             await signInWithEmailAndPassword(getAuth(), email, password);
          } catch (error) {
-            console.error('Email sign-in error:', error);//add crashlitics here
+            console.error('Email sign-in error:', error);
             alert('Sign-in failed: ' + error.message);
          }
       },
@@ -111,7 +126,6 @@ export function SessionProvider({ children }) {
             const user = userCredential.user;
 
             await setDoc(doc(db, 'users', user.uid), {
-               uid: user.uid,
                email: user.email,
                createdAt: serverTimestamp()
             })
@@ -123,6 +137,7 @@ export function SessionProvider({ children }) {
       signInWithGoogle: async () => {
          try {
             await GoogleSignin.hasPlayServices();
+            GoogleSignin.configure({webClientId: '1083515011208-94i0igbd3csa0v87fpr5ircunc4mohg3.apps.googleusercontent.com'})
             const signInResult = await GoogleSignin.signIn();
 
             let idToken = signInResult.data?.idToken;
@@ -135,16 +150,30 @@ export function SessionProvider({ children }) {
 
             const googleCredential = GoogleAuthProvider.credential(idToken);
 
-            await signInWithCredential(getAuth(), googleCredential);
+            const userCredential = await signInWithCredential(getAuth(), googleCredential);
+            const isNewUser = getAdditionalUserInfo(userCredential).isNewUser;
+
+            if (isNewUser) {
+                  await setDoc(doc(db, 'users', userCredential.user.uid), {
+                     email: userCredential.user.email || null,
+                     createdAt: serverTimestamp(),
+                  });
+               }
+
          } catch (error) {
             console.error('Google sign-in error:', error);
-            alert('Google Sign-in failed: ' + error.message);//add crashlitics here
+            alert('Google Sign-in failed: ' + error.message);
          }
       },
       signInWithGitHub: async () => {
             try {
                if (!request) {
                   throw new Error('GitHub OAuth request not ready');
+               }
+
+               if (isGitHubLoading) {
+                  console.log('GitHub sign-in already in progress...');
+                  return;
                }
 
                await promptAsync();
@@ -158,12 +187,12 @@ export function SessionProvider({ children }) {
             const isGoogleUser = user?.providerData?.some(
                (provider) => provider.providerId === 'google.com'
             );
-            
+
             if (isGoogleUser) {
                try {
-                  if (await GoogleSignin.isSignedIn()) {
-                     await GoogleSignin.signOut();
-                  }
+                  GoogleSignin.configure({webClientId: '1083515011208-94i0igbd3csa0v87fpr5ircunc4mohg3.apps.googleusercontent.com'})
+                  await GoogleSignin.signOut();
+
                } catch (googleError) {
                   console.warn('Google sign-out warning:', googleError);
                }

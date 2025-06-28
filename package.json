@@ -16,11 +16,11 @@
     "preset": "jest-expo"
   },
   "dependencies": {
+    "@expo/metro-config": "^0.20.15",
     "@expo/vector-icons": "^14.0.2",
     "@react-native-firebase/app": "^22.2.0",
     "@react-native-firebase/auth": "^22.2.0",
     "@react-native-firebase/firestore": "^22.2.0",
-    "@react-native-firebase/functions": "^22.2.1",
     "@react-native-google-signin/google-signin": "^14.0.1",
     "@react-navigation/bottom-tabs": "^7.2.0",
     "@react-navigation/native": "^7.0.14",
@@ -46,7 +46,7 @@
     "nativewind": "^4.1.23",
     "react": "19.1.0",
     "react-dom": "19.1.0",
-    "react-native": "0.79.3",
+    "react-native": "0.79.4",
     "react-native-bouncy-checkbox": "^4.1.2",
     "react-native-dotenv": "^3.4.11",
     "react-native-gesture-handler": "~2.24.0",
