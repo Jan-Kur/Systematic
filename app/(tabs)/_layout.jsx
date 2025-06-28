@@ -35,7 +35,7 @@ export default function TabLayout() {
             tabBarStyle: {
                backgroundColor: colorScheme === "dark" ? "#08060A" : "F6F5FF",
                borderTopWidth: 0,
-            }
+            },
          }}>
          <Tabs.Screen
             name="journal"
