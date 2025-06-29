@@ -7,7 +7,7 @@ export default Colors = {
     },
     dark: {
         main: "#08060A",
-        primary: "6A1FCC",
+        primary: "#6A1FCC",
         darkGray: "#202020",
         lightGray: "#444444",
     }

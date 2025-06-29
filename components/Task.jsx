@@ -1,30 +1,77 @@
+import { doc, getFirestore, updateDoc } from "@react-native-firebase/firestore";
 import Color from "color";
-import { TouchableOpacity, View } from "react-native";
-import BouncyCheckbox from "react-native-bouncy-checkbox";
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { Text, TouchableOpacity, View } from "react-native";
+import { useSession } from "../contexts/AuthContext";
+import ThreeStateCheckbox from "./ThreeStateCheckbox";
 
-export default function Task(name, color, emoji, duration) {
+export default function Task({id, name, color, emoji, duration}) {
 
-   const darkerColor = Color(color).darken(0.3).hex()
+   const [currentTaskState, setCurrentTaskState] = useState(0)
+
+   const db = getFirestore()
+
+   const {user} = useSession()
+   const userId = user.uid
+
+   const darkerColor = Color(color).darken(0.45).hex()
+   const evenDarkerColor = Color(color).darken(0.8).hex()
    
-   const height = duration <= 15 ? 45 : duration >= 300 ? 200 : 45 + (duration - 15) * (155 / 285);
+   const height = duration <= 15 ? 40 : duration >= 300 ? 200 : 40 + (duration - 15) * (160 / 285);
+
+   const debounceTimerRef = useRef(null);
+
+   const handleCheckboxPress = useCallback((stateNumber) => {
+      setCurrentTaskState(stateNumber)
+
+      const status = stateNumber === 0 ? "Not done" : stateNumber === 1 ? "Done" : "Kinda done"
+
+      
+      if (debounceTimerRef.current) {
+         clearTimeout(debounceTimerRef.current)
+      }
+
+      debounceTimerRef.current = setTimeout(() => {
+         updateDoc(doc(db, `users/${userId}/tasks/${id}`), {
+            status: status
+         })
+      }, 750)
+   }, [userId, id])
+
+   useEffect(() => {
+      return () => {
+         if (debounceTimerRef.current) {
+            clearTimeout(debounceTimerRef.current);
+         }
+      };
+   }, []);
+
+   const getBackgroundColor = () => {
+      return currentTaskState === 0 ? darkerColor : evenDarkerColor;
+   };
 
    return (
-      <TouchableOpacity className={`w-full h-[${height}] justify-between p-1 items-center bg-${darkerColor}`}>
-         <View className="w-2/5 justify-between items-center">
-            <View className={`w-fit h-fit p-1 ${bg-color}`}>
-               <Text className="text-2xl">{emoji}</Text>
+      <TouchableOpacity 
+         style={{
+            height: height,
+            backgroundColor: getBackgroundColor()
+         }}
+         className="w-full justify-between p-2 items-center flex-row rounded-lg"
+      >
+         <View className="w-2/5 justify-between items-center flex-row">
+            <View 
+               style={{ backgroundColor: color }}
+               className="p-1 rounded-lg"
+            >
+               <Text className="text-xl">{emoji}</Text>
             </View>
 
             <Text className="text-lightMain font-semibold text-xl">{name}</Text>
-         </View>
+         </View> 
 
-         <BouncyCheckbox
-            size={24}
-            fillColor={color}
-            unfillColor="#FFFFFF"
-            iconStyle={{ borderColor: color }}
-            innerIconStyle={{ borderWidth: 2 }}
-            style={{ marginRight: 12}}
+         <ThreeStateCheckbox
+            onStateChange={handleCheckboxPress}
+            borderColor={color}
          />
       </TouchableOpacity>
    )
