@@ -18,6 +18,7 @@
   "dependencies": {
     "@expo/metro-config": "^0.20.15",
     "@expo/vector-icons": "^14.0.2",
+    "@react-native-community/datetimepicker": "8.4.1",
     "@react-native-firebase/app": "^22.2.0",
     "@react-native-firebase/auth": "^22.2.0",
     "@react-native-firebase/firestore": "^22.2.0",
@@ -57,6 +58,7 @@
     "react-native-screens": "~4.11.1",
     "react-native-web": "^0.20.0",
     "react-native-webview": "13.13.5",
+    "reanimated-color-picker": "^4.1.0",
     "tailwindcss": "^3.4.17"
   },
   "devDependencies": {

@@ -1,10 +1,11 @@
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
-import { addDoc, collection, getDocs, getFirestore } from "@react-native-firebase/firestore";
+import { addDoc, collection, deleteDoc, getDocs, getFirestore } from "@react-native-firebase/firestore";
 import { FlashList } from "@shopify/flash-list";
 import { useEffect, useState } from "react";
-import { Platform, Text, TouchableOpacity, View } from "react-native";
+import { Modal, Platform, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Task from "../../components/Task";
+import TaskSettings from '../../components/TaskSettings';
 import TimelineHeader from "../../components/TimelineHeader";
 import { useSession } from '../../contexts/AuthContext';
 
@@ -17,7 +18,24 @@ export default function Index() {
    const {user} = useSession()
    const userId = user.uid
 
-   const [tasks, setTasks] = useState()
+   const [tasks, setTasks] = useState([])
+
+   const [selectedTask, setSelectedTask] = useState(null)
+
+   function handleOpenSettings(taskId) {
+      setSelectedTask(taskId);
+   };
+
+   function handleCloseSettings() {
+      setSelectedTask(null)
+   }
+
+   async function handleDelete(id) {
+      const newTasks = tasks.filter(item => item.id !== id)
+      setTasks(newTasks)
+
+      await deleteDoc(doc(db, `users/${userId}/tasks/${id}`))
+   }
 
    useEffect(() => {
       const fetchImprovements = async () => {
@@ -73,19 +91,19 @@ export default function Index() {
          <TimelineHeader/>
          <View className="w-full flex-1">
             <FlashList 
-            data={tasks}
-            renderItem={({item}) => <Task id={item.id} name={item.name} color={item.color} emoji={item.emoji} duration={item.duration}/>}
-            scrollEnabled={true}
-            ItemSeparatorComponent={Separator}
-            showsVerticalScrollIndicator={false}
-            ListEmptyComponent={
-               <Text className="text-gray-400 text-center py-4">
-                  No tasks yet
-               </Text>
-            }
-            estimatedItemSize={100}
-            keyExtractor={(item) => item.id}
-         />
+               data={tasks}
+               renderItem={({item}) => <Task id={item.id} name={item.name} color={item.color} emoji={item.emoji} duration={item.duration} status={item.status} onEdit={handleOpenSettings} onDelete={handleDelete}/>}
+               scrollEnabled={true}
+               ItemSeparatorComponent={Separator}
+               showsVerticalScrollIndicator={false}
+               ListEmptyComponent={
+                  <Text className="text-gray-400 text-center py-4">
+                     No tasks yet
+                  </Text>
+               }
+               estimatedItemSize={100}
+               keyExtractor={(item) => item.id}
+            />
          </View>
          
          <TouchableOpacity
@@ -94,6 +112,16 @@ export default function Index() {
          >
             <FontAwesome6 name="plus" size={24} color="#08060A"/>
          </TouchableOpacity>
+
+         <Modal
+            animationType="slide"
+            transparent={true}
+            visible={selectedTask !== null}
+            onRequestClose={handleCloseSettings}
+         >
+            <TaskSettings/>
+
+         </Modal>
       </ContainerComponent>
       
    );

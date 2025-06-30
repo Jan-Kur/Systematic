@@ -3,7 +3,7 @@ import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import { useState } from 'react';
 import { Animated, TouchableOpacity } from 'react-native';
 
-export default function ThreeStateCheckbox({ initialState = 0, onStateChange, borderColor }) {
+export default function CustomCheckbox({ initialState = 0, onStateChange, borderColor }) {
   const [currentState, setCurrentState] = useState(initialState);
   const [scaleAnim] = useState(new Animated.Value(1));
 
@@ -33,12 +33,13 @@ export default function ThreeStateCheckbox({ initialState = 0, onStateChange, bo
       
       case 1:
         return (
-         <FontAwesome6 name="question" size={20} color={borderColor} />
+         <Entypo name="check" size={22} color={borderColor} />
+         
         );
       
       case 2:
         return (
-         <Entypo name="check" size={20} color={borderColor} />
+         <FontAwesome6 name="question" size={22} color={borderColor} />
         );
     }
   };
@@ -47,7 +48,7 @@ export default function ThreeStateCheckbox({ initialState = 0, onStateChange, bo
     <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
       <TouchableOpacity
         onPress={handlePress}
-        className="w-[26px] h-[26px] bg-transparent justify-center items-center rounded-lg border-2"
+        className="w-[28px] h-[28px] bg-transparent justify-center items-center rounded-lg border-2"
         style={{ borderColor: borderColor }}
         activeOpacity={0.7}
       >
