@@ -119,8 +119,7 @@ export default function Index() {
             visible={selectedTask !== null}
             onRequestClose={handleCloseSettings}
          >
-            <TaskSettings/>
-
+            <TaskSettings onClose={handleCloseSettings}/>
          </Modal>
       </ContainerComponent>
       

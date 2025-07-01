@@ -1,14 +1,19 @@
-import { FontAwesome6 } from "@expo/vector-icons";
+import { AntDesign, Feather, FontAwesome6 } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useState } from "react";
-import { SafeAreaView, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { Modal, SafeAreaView, Text, TextInput, TouchableOpacity, View } from "react-native";
+import ColorPicker, { HueSlider, OpacitySlider, Panel1 } from "reanimated-color-picker";
 
-export default function TaskSettings() {
+export default function TaskSettings({onClose}) {
    const [time1, setTime1] = useState(new Date())
    const [time2, setTime2] = useState(new Date())
    const [show1, setShow1] = useState(false)
    const [show2, setShow2] = useState(false)
-   
+   const [date, setDate] = useState(new Date())
+   const [showDatePicker, setShowDatePicker] = useState(false)
+   const [color, setColor] = useState("#6A1FCC")
+   const [showColorPicker, setShowColorPicker] = useState(false)
+
    function onChangeTime1(event, selectedDate) {
       const currentDate = selectedDate
       setShow1(false)
@@ -47,6 +52,12 @@ export default function TaskSettings() {
       }
    }
 
+   function onChangeDate(event, selectedDate) {
+      const currentDate = selectedDate
+      setShowDatePicker(false)
+      setDate(currentDate)
+   }
+
    function formatTime(date) {
       const hours = String(date.getHours()).padStart(2, '0')
       const minutes = String(date.getMinutes()).padStart(2, '0')
@@ -65,46 +76,82 @@ export default function TaskSettings() {
    }
 
    return(
-      <SafeAreaView className="w-full h-full flex-1 flex-col gap-4 bg-darkMain items-center px-4 py-2">
+      <SafeAreaView className="w-full h-full flex-1 flex-col gap-5 bg-darkMain items-center px-6 py-2">
+         <TouchableOpacity className="absolute right-6 top-2" onPress={onClose}>
+            <AntDesign name="close" size={28} color="#6A1FCC" />
+         </TouchableOpacity>
+
          <TextInput
             placeholder="Name"
             className="text-3xl font-medium text-[#e3e1ea]"
          />
 
-         <View className="w-full bg-darkGray rounded-lg p-[6] text-center justify-center items-center -mt-2">
+         <View className="w-full bg-darkGray rounded-lg p-[6] text-center justify-center items-center -mt-3">
             <Text className="text-[#e3e1ea] font-medium text-2xl">Duration: {calculateDuration(time1, time2)}</Text>
          </View>
 
-         <View className="flex-row gap-3 items-center">
+         <View className="flex-row gap-3 items-center w-full">
             
-            <TouchableOpacity className="gap-2 py-2 px-5 bg-darkGray rounded-lg items-center justify-center" onPress={() => setShow1(true)}>
+            <TouchableOpacity className="py-2 bg-darkGray rounded-lg items-center justify-center flex-1" onPress={() => setShow1(true)}>
                <Text className="text-[#e3e1ea] text-xl font-medium">{formatTime(time1)}</Text>
             </TouchableOpacity>
             <TimePicker1/>
 
             <FontAwesome6 name="arrow-right" size={30} color="#6A1FCC" />
          
-            <TouchableOpacity className="gap-2 py-2 px-5 bg-darkGray rounded-lg items-center justify-center" onPress={() => setShow2(true)}>
+            <TouchableOpacity className="py-2  bg-darkGray rounded-lg items-center justify-center flex-1" onPress={() => setShow2(true)}>
                <Text className="text-[#e3e1ea] text-xl font-medium">{formatTime(time2)}</Text>
             </TouchableOpacity>
             <TimePicker2/>
          </View>
 
-         {/* 
+         <TouchableOpacity className="py-2 px-5 bg-darkGray rounded-lg items-center justify-center w-full flex-row gap-3"
+            onPress={() => setShowDatePicker(true)}
+         >
+            <Feather name="calendar" size={24} color="#6A1FCC" />
+            <Text className="text-[#e3e1ea] text-xl font-medium">{date.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric'})}</Text>
+         </TouchableOpacity>
+         {showDatePicker && <DateTimePicker onChange={onChangeDate} value={date} mode="date"/>}
 
-         <DateTimePicker/>
+         <View className="flex-row gap-5 items-center -mb-3">
+            <Text className="text-lg font-medium text-[#e3e1ea] flex-1 text-center">Color</Text>
+            <Text className="text-lg font-medium text-[#e3e1ea] flex-1 text-center">Emoji</Text>
+         </View>
 
-         <View className="flex-row gap-3 items-center">
-            <ColorPicker>
-               <Panel1/>
-            </ColorPicker>
+         <View className="flex-row gap-5 items-center">
+            <TouchableOpacity
+               onPress={() => setShowColorPicker(true)}
+               className=" h-12 rounded-lg shadow-md flex-1"
+               style={{ backgroundColor: color }}
+            />
+
+
+            <Modal visible={showColorPicker} animationType="slide" transparent={true}>
+               <View className="flex-1 bg-black bg-opacity-50 justify-center items-center px-5">
+                  <View className="bg-darkGray rounded-xl p-6 w-full max-w-md">
+                     <ColorPicker value={color} style={{ gap: 20 }} onChangeJS={({hex}) => setColor(hex)}>
+                        <Panel1 style={{ height: 150, borderRadius: 12 }}/>
+                        <HueSlider style={{ height: 20, borderRadius: 10 }} />
+                        <OpacitySlider style={{ height: 20, borderRadius: 10 }} />
+                     </ColorPicker>
+
+                     <TouchableOpacity
+                     onPress={() => setShowColorPicker(false)}
+                     className="bg-purple-700 rounded-lg py-3 mt-5 items-center"
+                     >
+                     <Text className="text-white font-semibold text-lg">Close</Text>
+                     </TouchableOpacity>
+                  </View>
+               </View>
+            </Modal>
+
 
             <TextInput
                placeholder="Emoji"
+               className="flex-1 bg-darkGray rounded-lg font-medium text-lg h-12"
             />
          </View>
-
-         <Switch/> */}
+         
       </SafeAreaView>
    )
 }
