@@ -1,5 +1,6 @@
 import { AntDesign, Feather, FontAwesome6 } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
+import GraphemeSplitter from "grapheme-splitter";
 import { useState } from "react";
 import { Modal, SafeAreaView, Text, TextInput, TouchableOpacity, View } from "react-native";
 import ColorPicker, { HueSlider, OpacitySlider, Panel1 } from "reanimated-color-picker";
@@ -15,6 +16,7 @@ export default function TaskSettings({onClose, onSave, task}) {
    const [showColorPicker, setShowColorPicker] = useState(false)
    const [name, setName] = useState(task?.name || "")
    const [emoji, setEmoji] = useState(task?.emoji || "")
+   const [error, setError] = useState(null)
 
    function onChangeTime1(event, selectedDate) {
       const currentDate = selectedDate
@@ -82,6 +84,27 @@ export default function TaskSettings({onClose, onSave, task}) {
       return Math.round(diffMs / (1000 * 60))
    }
 
+   function checkErrors() {
+      if (name.trim().length === 0) {
+         setError("Please enter a task name")
+         return false
+      }
+
+      const splitter = new GraphemeSplitter();
+      const graphemes = splitter.splitGraphemes(emoji);
+      if (graphemes.length !== 1) {
+         setError("Please enter 1 task emoji")
+         return false
+      }
+
+      if (getDurationInMinutes(time1, time2) <= 0) {
+         setError("Please set a valid timeframe")
+         return false
+      }
+
+      setError(null)
+      return true
+   }
 
    return(
       <SafeAreaView className="w-full h-full flex-1 flex-col gap-5 bg-darkMain items-center px-6 py-2">
@@ -91,7 +114,7 @@ export default function TaskSettings({onClose, onSave, task}) {
 
          <TextInput
             placeholder="Name"
-            className="text-3xl font-medium text-[#e3e1ea]"
+            className="text-3xl font-medium text-[#e3e1ea] w-4/5 text-center"
             onChangeText={text => setName(text)}
             value={name}
          />
@@ -166,13 +189,20 @@ export default function TaskSettings({onClose, onSave, task}) {
 
          <TouchableOpacity className="w-full bg-primary rounded-xl h-14 justify-center items-center mt-2"
             onPress={() => {
-               onSave({name, color, emoji, startDate: time1, duration: getDurationInMinutes(time1, time2)})
-               onClose()
-         }
-         }
+               if (checkErrors()) {
+                  onSave({name, color, emoji, startDate: time1, duration: getDurationInMinutes(time1, time2)})
+                  onClose()
+               }   
+            }}
          >
             <Text className="text-2xl text-[#e3e1ea] font-semibold">Save</Text>
          </TouchableOpacity>
+
+         {error && 
+            <View className="h-12 w-full rounded-xl bg-red-600/40 justify-center items-center">
+               <Text className="text-red-500 text-lg ">{error}</Text>
+            </View>  
+         }
          
       </SafeAreaView>
    )

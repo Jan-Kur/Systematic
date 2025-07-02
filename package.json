@@ -46,6 +46,7 @@
     "expo-system-ui": "~5.0.8",
     "expo-updates": "~0.28.14",
     "expo-web-browser": "~14.1.6",
+    "grapheme-splitter": "^1.0.4",
     "nativewind": "^4.1.23",
     "react": "19.1.0",
     "react-dom": "19.1.0",

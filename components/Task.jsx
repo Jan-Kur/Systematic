@@ -71,7 +71,7 @@ export default function Task({id, name, color, emoji, duration, status, onEdit, 
          className="w-full justify-between p-2 items-center flex-row rounded-xl"
          onPress={() => onEdit(id)}
       >
-         <View className="w-2/5 justify-between items-center flex-row">
+         <View className="justify-between items-center flex-row flex-1 gap-4">
             <View 
                style={{ backgroundColor: color }}
                className="p-1 rounded-lg"
@@ -79,10 +79,10 @@ export default function Task({id, name, color, emoji, duration, status, onEdit, 
                <Text className="text-xl">{emoji}</Text>
             </View>
 
-            <Text className="text-lightMain font-medium text-xl">{name}</Text>
+            <Text className="text-lightMain font-medium text-xl flex-1" numberOfLines={1} ellipsizeMode="tail">{name}</Text>
          </View> 
 
-         <View className="flex-row items-center w-fit gap-7">
+         <View className="flex-row items-center w-fit gap-7 ml-2">
             <TouchableOpacity
                onPress={() => onDelete(id)}   
             >
