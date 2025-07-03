@@ -22,6 +22,8 @@ export default function Index() {
 
    const [selectedTask, setSelectedTask] = useState(null)
 
+   const [isModalVisible, setIsModalVisible] = useState(false)
+
    async function saveTask(updatedData) {
       if (selectedTask) {
 
@@ -36,7 +38,7 @@ export default function Index() {
 
 
          if (hasChanged) {
-            const updatedTasks = tasks.map(item => {
+            let updatedTasks = tasks.map(item => {
                if (item.id === selectedTask) {
                   return {
                      ...item, ...updatedData 
@@ -44,6 +46,7 @@ export default function Index() {
                }
                return item
             })
+            updatedTasks.sort((a, b) => a.startDate - b.startDate)
             setTasks(updatedTasks)
 
             await updateDoc(doc(db, `users/${userId}/tasks/${selectedTask}`), {
@@ -61,17 +64,20 @@ export default function Index() {
             status: "Not done",
             ...updatedData
          }
-
-         setTasks([...tasks, newTask])
+         let newTasks = [...tasks, newTask]
+         newTasks.sort((a, b) => a.startDate - b.startDate)
+         setTasks(newTasks)
       }
    }
 
    function handleOpenSettings(taskId) {
       setSelectedTask(taskId);
+      setIsModalVisible(true)
    };
 
    function handleCloseSettings() {
       setSelectedTask(null)
+      setIsModalVisible(false)
    }
 
    async function handleDelete(id) {
@@ -82,7 +88,7 @@ export default function Index() {
    }
 
    useEffect(() => {
-      const fetchImprovements = async () => {
+      const fetchTasks = async () => {
          const snapshot = await getDocs(collection(db, `users/${userId}/tasks`))
 
          const data = snapshot.docs.map(doc => ({
@@ -94,40 +100,17 @@ export default function Index() {
             duration: doc.data().duration,
             status: doc.data().status
          }))
-         setTasks(data)
+         data.sort((a, b) => a.startDate - b.startDate)
+
+         setTasks(data)    
       }
-      fetchImprovements()
+      fetchTasks()
    }, [])
 
    function Separator() {
       return (
          <View className="h-3 bg-transparent w-full"/>
       )
-   }
-
-   async function addTask() {
-      const taskProps = {
-         name: "randomName",
-         color: "#6A1FCC",
-         emoji: "🗿",
-         startDate: new Date(),
-         duration: 25
-      }
-
-      const docRef = await addDoc(collection(db, `users/${userId}/tasks`), taskProps)
-
-      setTasks(prev => {
-         const updated = [
-            ...prev,
-            {
-               id: docRef.id,
-               ...taskProps,
-               status: "Not done"
-            }
-         ]
-
-         return updated
-      })
    }
 
    return (
@@ -151,7 +134,7 @@ export default function Index() {
          </View>
          
          <TouchableOpacity
-            onPress={addTask}
+            onPress={() => handleOpenSettings(null)}
             className="bg-primary rounded-full shadow-md justify-center items-center w-[50] h-[50]"
          >
             <FontAwesome6 name="plus" size={24} color="#08060A"/>
@@ -160,7 +143,7 @@ export default function Index() {
          <Modal
             animationType="slide"
             transparent={true}
-            visible={selectedTask !== null}
+            visible={isModalVisible}
             onRequestClose={handleCloseSettings}
          >
             <TaskSettings onClose={handleCloseSettings} onSave={saveTask} task={tasks.find(t => t.id === selectedTask) || null}/>

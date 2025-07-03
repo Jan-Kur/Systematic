@@ -68,13 +68,13 @@ export default function Task({id, name, color, emoji, duration, status, onEdit, 
             height: height,
             backgroundColor: getBackgroundColor()
          }}
-         className="w-full justify-between p-2 items-center flex-row rounded-xl"
+         className="w-full justify-between px-4 items-center flex-row rounded-xl"
          onPress={() => onEdit(id)}
       >
          <View className="justify-between items-center flex-row flex-1 gap-4">
             <View 
                style={{ backgroundColor: color }}
-               className="p-1 rounded-lg"
+               className="p-1 h-8 rounded-lg flex-col justify-center items-center text-center"
             >
                <Text className="text-xl">{emoji}</Text>
             </View>

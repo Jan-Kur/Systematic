@@ -1,13 +1,17 @@
 import { AntDesign, Feather, FontAwesome6 } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import GraphemeSplitter from "grapheme-splitter";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Modal, SafeAreaView, Text, TextInput, TouchableOpacity, View } from "react-native";
 import ColorPicker, { HueSlider, OpacitySlider, Panel1 } from "reanimated-color-picker";
 
 export default function TaskSettings({onClose, onSave, task}) {
    const [time1, setTime1] = useState(task?.startDate ? new Date(task.startDate) : new Date())
-   const [time2, setTime2] = useState(task?.startDate && task?.duration ? new Date(new Date(task.startDate).getTime() + task.duration * 60000): new Date())
+
+   const initialDate = new Date()
+   initialDate.setMinutes(initialDate.getMinutes() + 15)
+
+   const [time2, setTime2] = useState(task?.startDate && task?.duration ? new Date(new Date(task.startDate).getTime() + task.duration * 60000): initialDate)
    const [show1, setShow1] = useState(false)
    const [show2, setShow2] = useState(false)
    const [date, setDate] = useState(task?.startDate ? new Date(task.startDate) : new Date())
@@ -106,6 +110,27 @@ export default function TaskSettings({onClose, onSave, task}) {
       return true
    }
 
+   function getStartAndEndTimes(date, time1, time2) {
+      const startDateTime = new Date(date)
+      let endDateTime = new Date(date)
+
+      startDateTime.setHours(time1.getHours(), time1.getMinutes(), 0, 0)
+      endDateTime.setHours(time2.getHours(), time2.getMinutes(), 0, 0)
+
+      if (endDateTime <= startDateTime) {
+         endDateTime = new Date(endDateTime.getTime() + 24 * 60 * 60 * 1000)
+      }
+      return {startDateTime, endDateTime}
+   }
+
+   const { startDateTime, endDateTime } = useMemo(() => {
+      return getStartAndEndTimes(date, time1, time2);
+   }, [date, time1, time2]);
+
+   const durationDisplay = useMemo(() => {
+      return calculateDuration(startDateTime, endDateTime);
+   }, [startDateTime, endDateTime]);
+
    return(
       <SafeAreaView className="w-full h-full flex-1 flex-col gap-5 bg-darkMain items-center px-6 py-2">
          <TouchableOpacity className="absolute right-6 top-2" onPress={onClose}>
@@ -120,7 +145,7 @@ export default function TaskSettings({onClose, onSave, task}) {
          />
 
          <View className="w-full bg-darkGray rounded-lg p-[6] text-center justify-center items-center -mt-3 h-12">
-            <Text className="text-[#e3e1ea] font-medium text-2xl">Duration: {calculateDuration(time1, time2)}</Text>
+            <Text className="text-[#e3e1ea] font-medium text-2xl">Duration: {durationDisplay}</Text>
          </View>
 
          <View className="flex-row gap-3 items-center w-full">
@@ -190,7 +215,7 @@ export default function TaskSettings({onClose, onSave, task}) {
          <TouchableOpacity className="w-full bg-primary rounded-xl h-14 justify-center items-center mt-2"
             onPress={() => {
                if (checkErrors()) {
-                  onSave({name, color, emoji, startDate: time1, duration: getDurationInMinutes(time1, time2)})
+                  onSave({name, color, emoji, startDate: startDateTime, duration: getDurationInMinutes(startDateTime, endDateTime)})
                   onClose()
                }   
             }}
@@ -201,7 +226,7 @@ export default function TaskSettings({onClose, onSave, task}) {
          {error && 
             <View className="h-12 w-full rounded-xl bg-red-600/40 justify-center items-center">
                <Text className="text-red-500 text-lg ">{error}</Text>
-            </View>  
+            </View>
          }
          
       </SafeAreaView>

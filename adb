@@ -1,0 +1,1 @@
+/mnt/c/Users/dzban/AppData/Local/Android/Sdk/platform-tools/adb.exe
