@@ -5,7 +5,7 @@ import { useMemo, useState } from "react";
 import { Modal, SafeAreaView, Text, TextInput, TouchableOpacity, View } from "react-native";
 import ColorPicker, { HueSlider, OpacitySlider, Panel1 } from "reanimated-color-picker";
 
-export default function TaskSettings({onClose, onSave, task}) {
+export default function TaskSettings({onClose, onSave, task, tasksArray}) {
    const [time1, setTime1] = useState(task?.startDate ? new Date(task.startDate) : new Date())
 
    const initialDate = new Date()
@@ -101,8 +101,14 @@ export default function TaskSettings({onClose, onSave, task}) {
          return false
       }
 
-      if (getDurationInMinutes(time1, time2) <= 0) {
-         setError("Please set a valid timeframe")
+      const overlapping = tasksArray.find(item => {
+         if (task && item.id === task.id) {
+            return false
+         }
+         return startDateTime < new Date (item.startDate.getTime() + item.duration * 60 * 1000) && endDateTime > item.startDate
+      })
+      if (overlapping !== undefined) {
+         setError("Your selected timeframe overlaps with an existing task")
          return false
       }
 
@@ -224,7 +230,7 @@ export default function TaskSettings({onClose, onSave, task}) {
          </TouchableOpacity>
 
          {error && 
-            <View className="h-12 w-full rounded-xl bg-red-600/40 justify-center items-center">
+            <View className="h-fit w-full rounded-xl bg-red-600/40 justify-center items-center p-2">
                <Text className="text-red-500 text-lg ">{error}</Text>
             </View>
          }

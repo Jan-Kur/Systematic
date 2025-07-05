@@ -6,7 +6,7 @@ import { Text, TouchableOpacity, View } from "react-native";
 import { useSession } from "../contexts/AuthContext";
 import CustomCheckbox from "./CustomCheckbox";
 
-export default function Task({id, name, color, emoji, duration, status, onEdit, onDelete}) {
+export default function Task({id, name, color, emoji, startDate, duration, status, onEdit, onDelete, showStartTime, showEndTime}) {
 
    const [currentTaskState, setCurrentTaskState] = useState(0)                                                                                                                                                 
 
@@ -26,10 +26,10 @@ export default function Task({id, name, color, emoji, duration, status, onEdit, 
    const {user} = useSession()
    const userId = user.uid
 
-   const darkerColor = Color(color).darken(0.5).hex()
-   const evenDarkerColor = Color(color).darken(0.8).hex()
+   const darkerColor = Color(color).darken(0.45).hex()
+   const evenDarkerColor = Color(color).darken(0.75).hex()
    
-   const height = duration <= 15 ? 40 : duration >= 300 ? 200 : 40 + (duration - 15) * (160 / 285);
+   const height = duration <= 15 ? 60 : duration >= 300 ? 300 : 60 + (duration - 15) * (240 / 285);
 
    const debounceTimerRef = useRef(null);
 
@@ -62,41 +62,64 @@ export default function Task({id, name, color, emoji, duration, status, onEdit, 
       return currentTaskState === 0 ? darkerColor : evenDarkerColor;
    };
 
+   const endDate = new Date(startDate.getTime() + duration * 60 * 1000)
+
+   const hours = Math.floor(duration / 60)
+   const mins = duration % 60
+
    return (
-      <TouchableOpacity 
-         style={{
-            height: height,
-            backgroundColor: getBackgroundColor()
-         }}
-         className="w-full justify-between px-4 items-center flex-row rounded-xl"
-         onPress={() => onEdit(id)}
-      >
-         <View className="justify-between items-center flex-row flex-1 gap-4">
-            <View 
-               style={{ backgroundColor: color }}
-               className="p-1 h-8 rounded-lg flex-col justify-center items-center text-center"
-            >
-               <Text className="text-xl">{emoji}</Text>
+      <View className="flex-row justify-between">
+         <View className="flex-col justify-between w-12">
+            <View>  
+               {showStartTime && 
+                  <Text style={{fontSize: 12, lineHeight: 12}} className="font-semibold text-lightMain/80">{startDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</Text>
+               }
             </View>
-
-            <Text className="text-lightMain font-medium text-xl flex-1" numberOfLines={1} ellipsizeMode="tail">{name}</Text>
-         </View> 
-
-         <View className="flex-row items-center w-fit gap-7 ml-2">
-            <TouchableOpacity
-               onPress={() => onDelete(id)}   
-            >
-               <FontAwesome6 name="trash-can" size={24} color={color} />
-            </TouchableOpacity>
-
-            <CustomCheckbox
-               initialState={initialState}
-               onStateChange={handleCheckboxPress}
-               borderColor={color}
-            />
+            
+            <View>
+               {showEndTime &&
+                  <Text style={{fontSize: 12, lineHeight: 12}} className="font-semibold text-lightMain/80">{endDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</Text>
+               }
+            </View>
          </View>
 
-         
-      </TouchableOpacity>
+
+         <TouchableOpacity 
+            style={{
+               height: height,
+               backgroundColor: getBackgroundColor()
+            }}
+            className="flex-1 justify-between px-3 items-center flex-row rounded-xl"
+            onPress={() => onEdit(id)}
+         >
+            <View className="justify-between items-center flex-row flex-1 gap-4 h-fit">
+               <View 
+                  style={{ backgroundColor: color, width: 40, height: 40 }}
+                  className="rounded-lg justify-center items-center"
+               >
+                  <Text style={{fontSize: 28, lineHeight: 40}} className="text-center">{emoji}</Text>
+               </View>
+               <View className="flex-col flex-1">
+                  <Text className="text-lightMain font-medium text-xl" numberOfLines={1} ellipsizeMode="tail">{name}</Text>
+                  <Text className="text-base text-lightMain/80 font-normal">{`${startDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - ${endDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} (${hours > 0 ? `${hours}h ` : ''}${mins}min)`}</Text>
+               </View>
+            </View> 
+
+            <View className="flex-row items-center w-fit gap-7 ml-2">
+               <TouchableOpacity
+                  onPress={() => onDelete(id)}   
+               >
+                  <FontAwesome6 name="trash-can" size={28} color={color} />
+               </TouchableOpacity>
+
+               <CustomCheckbox
+                  initialState={initialState}
+                  onStateChange={handleCheckboxPress}
+                  borderColor={color}
+               />
+            </View>
+         </TouchableOpacity>
+      </View>
+      
    )
 }
