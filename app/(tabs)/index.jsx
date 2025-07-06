@@ -1,6 +1,7 @@
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import { addDoc, collection, deleteDoc, doc, getDocs, getFirestore, updateDoc } from "@react-native-firebase/firestore";
 import { FlashList } from "@shopify/flash-list";
+import { LinearGradient } from 'expo-linear-gradient';
 import { useEffect, useState } from "react";
 import { Modal, Platform, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -133,6 +134,7 @@ export default function Index() {
          if (gap === 0) {
             return (
                <View className="w-full flex-row justify-start items-center">
+                  <LinearGradient className="absolute w-1 h-full left-[29]" colors={[leadingItem.color, trailingItem.color]}/>
                   <Text style={{fontSize: 12, lineHeight: 12}} className="font-semibold text-lightMain/80">{trailingItem.startDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</Text>
                </View>
                

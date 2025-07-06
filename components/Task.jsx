@@ -89,9 +89,11 @@ export default function Task({id, name, color, emoji, startDate, duration, statu
                height: height,
                backgroundColor: getBackgroundColor()
             }}
-            className="flex-1 justify-between px-3 items-center flex-row rounded-xl"
+            className="flex-1 justify-between px-3 items-center flex-row rounded-xl relative"
             onPress={() => onEdit(id)}
-         >
+         >  
+            <View className="absolute w-1 h-full left-[29] " style={{backgroundColor: color}}/>
+
             <View className="justify-between items-center flex-row flex-1 gap-4 h-fit">
                <View 
                   style={{ backgroundColor: color, width: 40, height: 40 }}
