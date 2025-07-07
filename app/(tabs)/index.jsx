@@ -3,7 +3,7 @@ import { addDoc, collection, deleteDoc, doc, getDocs, getFirestore, updateDoc } 
 import { FlashList } from "@shopify/flash-list";
 import { LinearGradient } from 'expo-linear-gradient';
 import { useEffect, useState } from "react";
-import { Modal, Platform, Text, TouchableOpacity, View } from "react-native";
+import { Modal, PixelRatio, Platform, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Task from "../../components/Task";
 import TaskSettings from '../../components/TaskSettings';
@@ -121,39 +121,59 @@ export default function Index() {
    }, [])
 
    function Separator({leadingItem, trailingItem}) {
-      if (typeof trailingItem === "string") {
 
-         return <View className="h-3 bg-transparent w-full"/>
-
-      } else if (typeof leadingItem === "string") {
-         
-         return <View className="h-1 bg-transparent w-full"/>
-
-      } else {
+      if (typeof leadingItem !== "string" && typeof trailingItem !== "string") {
          const gap = trailingItem.startDate.getTime() - (leadingItem.startDate.getTime() + (leadingItem.duration * 60 * 1000))
          if (gap === 0) {
             return (
                <View className="w-full flex-row justify-start items-center">
-                  <LinearGradient className="absolute w-1 h-full left-[29]" colors={[leadingItem.color, trailingItem.color]}/>
+                  {new Date() >= trailingItem.startDate && 
+                     <LinearGradient className="absolute w-1 left-[71]" colors={[leadingItem.color, trailingItem.color]} style={{height: 12.3}}/>
+                  }
+                  {new Date() < trailingItem.startDate && 
+                     <View className="absolute w-1 left-[71] bg-darkGray" style={{height: 12.3}}/>
+                  }
                   <Text style={{fontSize: 12, lineHeight: 12}} className="font-semibold text-lightMain/80">{trailingItem.startDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</Text>
                </View>
-               
             )
          } else {
+            const [progress, setProgress] = useState()
+
+            const height = 44.5 
+
             const gapMins = Math.floor((gap / 1000) / 60)
             const hours = Math.floor(gapMins / 60)
             const mins = gapMins % 60
 
+            useEffect(() => {
+               let animationFrameId;
+               function updateProgress() {
+                  const elapsedTime = new Date().getTime() - (leadingItem.startDate.getTime() + (leadingItem.duration * 60 * 1000))
+                  setProgress(Math.max(Math.min(elapsedTime/gap, 1), 0))
+                  animationFrameId = requestAnimationFrame(updateProgress)
+               } 
+               animationFrameId = requestAnimationFrame(updateProgress)
+
+               return () => cancelAnimationFrame(animationFrameId)
+            }, [leadingItem, gap])
+
             return (
-               <View className="my-3 flex-row flex-between w-full ">
+               <View className="flex-row flex-between w-full relative">
+                  <View className="absolute z-40 left-[71] h-full ">
+                     <LinearGradient className="w-1 " colors={[leadingItem.color, trailingItem.color]} style={{height: 39.5}}/>
+                  </View>
+                  <View className="absolute h-full z-50 flex-col-reverse left-[71]">
+                     <View className="w-1 bg-darkGray absolute left-0 right-0 bottom-0" style={{top: PixelRatio.roundToNearestPixel(height * progress)}}/>
+                  </View>
+                  
                   <View className="w-12"/>
-                  <View className="bg-darkGray/40 rounded-lg flex-1 py-2">
+                  <View className="rounded-lg flex-1 py-2">
                      <Text className="text-xl font-medium text-lightMain/80 text-center">{`${hours > 0 ? `${hours}h ` : ''}${mins}min`}</Text>
                   </View>
                </View>
             )
          }
-      }
+      }  
    }
 
    function addSections (tasksArray) {
@@ -177,9 +197,24 @@ export default function Index() {
       return result
    }
 
-   function Section({title}) {
+   function Section({title, index, tasks}) {
+      const previousTask = tasks.slice(index - 1).find(item => typeof item !== "string")
+      const nextTask = tasks.slice(index + 1).find(item => typeof item !== "string")
+
+
+
       return (
-         <Text className="text-lg text-lightMain/80 font-medium text-center w-full">{title}</Text>
+         <View className="relative ">
+            {new Date() >= nextTask.startDate && 
+               <LinearGradient className="absolute w-1 left-[71] h-full" colors={[previousTask.color, nextTask.color]}/>
+            }
+            {new Date() < nextTask.startDate && 
+               <View className="absolute w-1 left-[71] h-full bg-darkGray"/>
+            }
+            <View className="mt-3 mb-1">
+               <Text className="text-lg text-lightMain/80 font-medium text-center w-full">{title}</Text>
+            </View>
+         </View>     
       )
    }
 
@@ -191,7 +226,7 @@ export default function Index() {
                data={displayTasks}
                renderItem={({item, index}) => {
                   if (typeof item === "string") {
-                     return <Section title={item}/>
+                     return <Section title={item} index={index} tasks={displayTasks}/>
                   } else {
                      const previousItem = displayTasks[index - 1]
                      const nextItem = displayTasks[index + 1]
