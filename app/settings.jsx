@@ -10,8 +10,8 @@ export default function Settings() {
    const ContainerComponent = Platform.OS === 'web' ? View : SafeAreaView;
 
    return (
-      <ContainerComponent className="bg-lightMain dark:bg-darkMain flex-1 flex-col justify-start gap-5 items-center pl-4 pr-4 pt-2 pb-2">
-         <TouchableOpacity className ="w-full bg-transparent h-fit justify-end flex-row items-center" onPress={() => useRouter().back()}>
+      <ContainerComponent className="bg-lightMain dark:bg-darkMain flex-1 flex-col justify-start gap-5 items-center px-2 pt-2 pb-2">
+         <TouchableOpacity className ="w-fit bg-transparent h-fit justify-end flex-row items-center self-end" onPress={() => useRouter().back()}>
             <AntDesign name="close" size={28} color="#6A1FCC" />
          </TouchableOpacity>
          <TouchableOpacity className="bg-primary w-fit h-fit p-2" 
@@ -21,6 +21,6 @@ export default function Settings() {
             <Text className="text-xl">Sign out</Text>
          </TouchableOpacity>
       </ContainerComponent>
-      
+
    );
 }

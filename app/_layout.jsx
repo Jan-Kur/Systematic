@@ -5,6 +5,7 @@ import { ActivityIndicator, useColorScheme, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import Colors from '../constants/Colors';
 import { SessionProvider, useSession } from '../contexts/AuthContext';
+import { TasksProvider } from "../contexts/TasksContext";
 import "../global.css";
 
 
@@ -19,11 +20,13 @@ export default function RootLayout() {
   return (
    <GestureHandlerRootView style={{ flex: 1 }}>
       <SessionProvider>
-         <StatusBar
-         backgroundColor={statusBarBackgroundColor}
-         style={statusBarStyle}
-         />
-         <RootNavigator/>
+         <TasksProvider>
+            <StatusBar
+            backgroundColor={statusBarBackgroundColor}
+            style={statusBarStyle}
+            />
+            <RootNavigator/>
+         </TasksProvider>
       </SessionProvider>
    </GestureHandlerRootView>
    

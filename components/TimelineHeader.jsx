@@ -6,7 +6,7 @@ import { TouchableOpacity, View } from "react-native";
 export default function TimelineHeader() {
    return (
       <View className ="w-full bg-transparent h-fit justify-between flex-row items-center">
-         <TouchableOpacity>
+         <TouchableOpacity onPress={() => router.push("/focusMode")}>
             <MaterialIcons name="hourglass-empty" size={28} color="#6A1FCC"/>
          </TouchableOpacity>
 

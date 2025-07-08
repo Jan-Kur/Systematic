@@ -1,5 +1,5 @@
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
-import { addDoc, collection, deleteDoc, doc, getDocs, getFirestore, updateDoc } from "@react-native-firebase/firestore";
+import { addDoc, collection, deleteDoc, doc, getFirestore, updateDoc } from "@react-native-firebase/firestore";
 import { FlashList } from "@shopify/flash-list";
 import { LinearGradient } from 'expo-linear-gradient';
 import { useEffect, useState } from "react";
@@ -9,6 +9,7 @@ import Task from "../../components/Task";
 import TaskSettings from '../../components/TaskSettings';
 import TimelineHeader from "../../components/TimelineHeader";
 import { useSession } from '../../contexts/AuthContext';
+import { useTasks } from "../../contexts/TasksContext";
 
 export default function Index() {
 
@@ -19,7 +20,7 @@ export default function Index() {
    const {user} = useSession()
    const userId = user.uid
 
-   const [tasks, setTasks] = useState([])
+   const {tasks, setTasks} = useTasks()
 
    const [displayTasks, setDisplayTasks] = useState([])
 
@@ -27,16 +28,23 @@ export default function Index() {
 
    const [isModalVisible, setIsModalVisible] = useState(false)
 
+   useEffect(() => {
+      if (tasks) {
+         const finalTasks = addSections(tasks)
+         setDisplayTasks(finalTasks)
+      }
+   }, [tasks])
+
    async function saveTask(updatedData) {
       if (selectedTask) {
 
-         const currentTask = tasks.find(item => item.id === selectedTask)
+         const thisTask = tasks.find(item => item.id === selectedTask)
 
          const hasChanged = Object.keys(updatedData).some(key => {
             if (key === 'startDate') {
-               return currentTask[key].getTime() !== updatedData[key].getTime()
+               return thisTask[key].getTime() !== updatedData[key].getTime()
             }
-            return currentTask[key] !== updatedData[key]
+            return thisTask[key] !== updatedData[key]
          })
 
 
@@ -51,9 +59,6 @@ export default function Index() {
             })
             updatedTasks.sort((a, b) => a.startDate - b.startDate)
             setTasks(updatedTasks)
-
-            const finalTasks = addSections(updatedTasks)
-            setDisplayTasks(finalTasks)
 
             await updateDoc(doc(db, `users/${userId}/tasks/${selectedTask}`), {
                ...updatedData
@@ -73,9 +78,6 @@ export default function Index() {
          let newTasks = [...tasks, newTask]
          newTasks.sort((a, b) => a.startDate - b.startDate)
          setTasks(newTasks)
-
-         const finalTasks = addSections(newTasks)
-         setDisplayTasks(finalTasks)
       }
    }
 
@@ -93,35 +95,46 @@ export default function Index() {
       const newTasks = tasks.filter(item => item.id !== id)
       setTasks(newTasks)
 
-      setDisplayTasks(addSections(newTasks))
-
       await deleteDoc(doc(db, `users/${userId}/tasks/${id}`))
    }
 
-   useEffect(() => {
-      const fetchTasks = async () => {
-         const snapshot = await getDocs(collection(db, `users/${userId}/tasks`))
+   function GapSeparator({ leadingItem, trailingItem, gap }) {
+      const [progress, setProgress] = useState(0);
+      const height = 44.5;
+      const gapMins = Math.floor((gap / 1000) / 60);
+      const hours = Math.floor(gapMins / 60);
+      const mins = gapMins % 60;
 
-         const data = snapshot.docs.map(doc => ({
-            id: doc.id,
-            name: doc.data().name,
-            color: doc.data().color,
-            emoji: doc.data().emoji,
-            startDate: doc.data().startDate.toDate(),
-            duration: doc.data().duration,
-            status: doc.data().status
-         }))
-         data.sort((a, b) => a.startDate - b.startDate)
-         setTasks(data) 
-         
-         const finalData = addSections(data)
-         setDisplayTasks(finalData)
-      }
-      fetchTasks()
-   }, [])
+      useEffect(() => {
+         let animationFrameId;
+         function updateProgress() {
+            const elapsedTime = new Date().getTime() - (leadingItem.startDate.getTime() + (leadingItem.duration * 60 * 1000));
+            setProgress(Math.max(Math.min(elapsedTime / gap, 1), 0));
+            animationFrameId = requestAnimationFrame(updateProgress);
+         }
+         animationFrameId = requestAnimationFrame(updateProgress);
+
+         return () => cancelAnimationFrame(animationFrameId);
+      }, [leadingItem, gap]);
+
+      return (
+         <View className="flex-row flex-between w-full relative">
+            <View className="absolute z-40 left-[71] h-full ">
+               <LinearGradient className="w-1 " colors={[leadingItem.color, trailingItem.color]} style={{ height: 39.5 }} />
+            </View>
+            <View className="absolute h-full z-50 flex-col-reverse left-[71]">
+               <View className="w-1 bg-darkGray absolute left-0 right-0 bottom-0" style={{ top: PixelRatio.roundToNearestPixel(height * progress) }} />
+            </View>
+
+            <View className="w-12" />
+            <View className="rounded-lg flex-1 py-2">
+               <Text className="text-xl font-medium text-lightMain/80 text-center">{`${hours > 0 ? `${hours}h ` : ''}${mins}min`}</Text>
+            </View>
+         </View>
+      );
+   }
 
    function Separator({leadingItem, trailingItem}) {
-
       if (typeof leadingItem !== "string" && typeof trailingItem !== "string") {
          const gap = trailingItem.startDate.getTime() - (leadingItem.startDate.getTime() + (leadingItem.duration * 60 * 1000))
          if (gap === 0) {
@@ -137,43 +150,10 @@ export default function Index() {
                </View>
             )
          } else {
-            const [progress, setProgress] = useState()
-
-            const height = 44.5 
-
-            const gapMins = Math.floor((gap / 1000) / 60)
-            const hours = Math.floor(gapMins / 60)
-            const mins = gapMins % 60
-
-            useEffect(() => {
-               let animationFrameId;
-               function updateProgress() {
-                  const elapsedTime = new Date().getTime() - (leadingItem.startDate.getTime() + (leadingItem.duration * 60 * 1000))
-                  setProgress(Math.max(Math.min(elapsedTime/gap, 1), 0))
-                  animationFrameId = requestAnimationFrame(updateProgress)
-               } 
-               animationFrameId = requestAnimationFrame(updateProgress)
-
-               return () => cancelAnimationFrame(animationFrameId)
-            }, [leadingItem, gap])
-
-            return (
-               <View className="flex-row flex-between w-full relative">
-                  <View className="absolute z-40 left-[71] h-full ">
-                     <LinearGradient className="w-1 " colors={[leadingItem.color, trailingItem.color]} style={{height: 39.5}}/>
-                  </View>
-                  <View className="absolute h-full z-50 flex-col-reverse left-[71]">
-                     <View className="w-1 bg-darkGray absolute left-0 right-0 bottom-0" style={{top: PixelRatio.roundToNearestPixel(height * progress)}}/>
-                  </View>
-                  
-                  <View className="w-12"/>
-                  <View className="rounded-lg flex-1 py-2">
-                     <Text className="text-xl font-medium text-lightMain/80 text-center">{`${hours > 0 ? `${hours}h ` : ''}${mins}min`}</Text>
-                  </View>
-               </View>
-            )
+            return <GapSeparator leadingItem={leadingItem} trailingItem={trailingItem} gap={gap} />;
          }
-      }  
+      }
+      return null;
    }
 
    function addSections (tasksArray) {
@@ -205,10 +185,10 @@ export default function Index() {
 
       return (
          <View className="relative ">
-            {new Date() >= nextTask.startDate && 
+            {previousTask && nextTask && new Date() >= nextTask.startDate && 
                <LinearGradient className="absolute w-1 left-[71] h-full" colors={[previousTask.color, nextTask.color]}/>
             }
-            {new Date() < nextTask.startDate && 
+            {previousTask && nextTask && new Date() < nextTask.startDate && 
                <View className="absolute w-1 left-[71] h-full bg-darkGray"/>
             }
             <View className="mt-3 mb-1">
@@ -219,7 +199,7 @@ export default function Index() {
    }
 
    return (
-      <ContainerComponent className="bg-lightMain dark:bg-darkMain flex-1 flex-col justify-start gap-5 items-center pl-4 pr-4 pt-2 pb-2">
+      <ContainerComponent className="bg-lightMain dark:bg-darkMain flex-1 flex-col justify-start gap-5 items-center px-2 pt-2 pb-2">
          <TimelineHeader/>
          <View className="w-full flex-1">
             <FlashList 
