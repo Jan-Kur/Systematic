@@ -96,7 +96,7 @@ export default function TaskSettings({onClose, onSave, task, tasksArray}) {
 
       const splitter = new GraphemeSplitter();
       const graphemes = splitter.splitGraphemes(emoji);
-      if (graphemes.length !== 1) {
+      if (graphemes.length > 1) {
          setError("Please enter 1 task emoji")
          return false
       }
@@ -203,7 +203,7 @@ export default function TaskSettings({onClose, onSave, task, tasksArray}) {
                      onPress={() => setShowColorPicker(false)}
                      className="bg-purple-700 rounded-lg py-3 mt-5 items-center"
                      >
-                     <Text className="text-white font-semibold text-lg">Close</Text>
+                     <Text className="text-[#e3e1ea] font-semibold text-lg">Close</Text>
                      </TouchableOpacity>
                   </View>
                </View>

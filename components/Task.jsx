@@ -87,13 +87,13 @@ export default function Task({id, name, color, emoji, startDate, duration, statu
          <View className="flex-col justify-between w-12">
             <View>  
                {showStartTime && 
-                   <Text style={{fontSize: 12, lineHeight: 12}} className="font-semibold text-lightMain/80">{startDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</Text>
+                   <Text style={{fontSize: 12, lineHeight: 12}} className="font-semibold text-lightMain/90">{startDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</Text>
                }
             </View>
             
             <View>
                {showEndTime &&
-                   <Text style={{fontSize: 12, lineHeight: 12}} className="font-semibold text-lightMain/80">{endDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</Text>
+                   <Text style={{fontSize: 12, lineHeight: 12}} className="font-semibold text-lightMain/90">{endDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</Text>
                }
             </View>
          </View>

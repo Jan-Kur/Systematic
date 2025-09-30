@@ -25,7 +25,7 @@ export function TasksProvider({children}) {
                emoji: doc.data().emoji,
                startDate: doc.data().startDate.toDate(),
                duration: doc.data().duration,
-               status: doc.data().status
+               status: doc.data().status,
             }))
             data.sort((a,b) => a.startDate - b.startDate)
             setTasks(data)
@@ -34,16 +34,31 @@ export function TasksProvider({children}) {
       }
    }, [user])
 
+   function shallowEqual(obj1, obj2) {
+      if (obj1 === obj2) return true
+      if (!obj1 || !obj2) return false
+      const keys1 = Object.keys(obj1)
+      const keys2 = Object.keys(obj2)
+      if (keys1.length !== keys2.length) return false
+      return keys1.every(key => obj1[key] === obj2[key])
+   }
+
+
    useEffect(() => {
       const findActiveTask = () => {
-         const activeTask = tasks.find(task => {
-            const now = new Date().getTime()
-            const startTime = task.startDate.getTime()
-            const endTime = startTime + (task.duration * 60 * 1000)
-            return now >= startTime && now < endTime
+         const now = new Date().getTime()
+         const found = tasks.find(task => {
+            const start = task.startDate.getTime()
+            const end = start + task.duration * 60 * 1000
+            return now >= start && now < end
          })
-         setCurrentTask(activeTask || null)
-      };
+
+         setCurrentTask(prev => {
+            if (prev?.id === found?.id) return prev
+            return found || null
+         })
+      }
+
 
       findActiveTask()
 

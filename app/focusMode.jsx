@@ -1,7 +1,7 @@
 import { AntDesign } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
-import { Text, TouchableOpacity, View } from "react-native";
+import { ImageBackground, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useTasks } from "../contexts/TasksContext";
 
@@ -52,26 +52,28 @@ export default function FocusMode() {
    }
 
    return (
-      <SafeAreaView className="bg-lightMain dark:bg-darkMain flex-1 flex-col justify-start gap-5 items-center px-2 pt-2 pb-2">
-         <TouchableOpacity className ="w-fit bg-transparent h-fit self-end" onPress={() => useRouter().back()}>
-            <AntDesign name="close" size={28} color="#6A1FCC" />
-         </TouchableOpacity>
-         {currentTask ? (
-            <>
-               <Text className="text-4xl font-bold text-darkMain dark:text-lightMain text-center">{currentTask.name}</Text>
-               
-               <View className="w-4/5 h-2 bg-darkMain dark:bg-lightMain rounded-full overflow-hidden">
-                  <View 
-                     className="h-2 bg-primary" 
-                     style={{ width: `${progress * 100}%` }} 
-                  />
-               </View>
-               
-               <Text className="text-7xl text-primary">{formatTimer(timeLeft)}</Text>
-            </>
-         ) : (
-            <Text className="text-xl text-darkMain dark:text-lightMain">No active task</Text>
-         )}
+      <SafeAreaView className="bg-lightMain dark:bg-darkMain flex-1 ">
+         <ImageBackground className="w-full h-full flex-col justify-start gap-5 items-center px-2 pt-2 pb-2">
+            <TouchableOpacity className ="w-fit bg-transparent h-fit self-end" onPress={() => useRouter().back()}>
+               <AntDesign name="close" size={28} color="#6A1FCC" />
+            </TouchableOpacity>
+            {currentTask ? (
+               <>
+                  <Text className="text-4xl font-bold text-darkMain dark:text-lightMain text-center">{currentTask.name}</Text>
+                  
+                  <View className="w-4/5 h-2 bg-darkMain dark:bg-lightMain rounded-full overflow-hidden">
+                     <View 
+                        className="h-2 bg-primary" 
+                        style={{ width: `${progress * 100}%` }} 
+                     />
+                  </View>
+                  
+                  <Text className="text-7xl text-primary">{formatTimer(timeLeft)}</Text>
+               </>
+            ) : (
+               <Text className="text-xl text-darkMain dark:text-lightMain">No active task</Text>
+            )}
+         </ImageBackground>
       </SafeAreaView>
    )
 }

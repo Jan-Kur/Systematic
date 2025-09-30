@@ -3,7 +3,7 @@ import { addDoc, collection, deleteDoc, doc, getFirestore, updateDoc } from "@re
 import { FlashList } from "@shopify/flash-list";
 import { LinearGradient } from 'expo-linear-gradient';
 import { useEffect, useState } from "react";
-import { Modal, PixelRatio, Platform, Text, TouchableOpacity, View } from "react-native";
+import { Modal, Platform, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Task from "../../components/Task";
 import TaskSettings from '../../components/TaskSettings';
@@ -12,7 +12,6 @@ import { useSession } from '../../contexts/AuthContext';
 import { useTasks } from "../../contexts/TasksContext";
 
 export default function Index() {
-
    const ContainerComponent = Platform.OS === 'web' ? View : SafeAreaView;
 
    const db = getFirestore()
@@ -100,7 +99,7 @@ export default function Index() {
 
    function GapSeparator({ leadingItem, trailingItem, gap }) {
       const [progress, setProgress] = useState(0);
-      const height = 44.5;
+      const height = 52.7;
       const gapMins = Math.floor((gap / 1000) / 60);
       const hours = Math.floor(gapMins / 60);
       const mins = gapMins % 60;
@@ -120,15 +119,15 @@ export default function Index() {
       return (
          <View className="flex-row flex-between w-full relative">
             <View className="absolute z-40 left-[71] h-full ">
-               <LinearGradient className="w-1 " colors={[leadingItem.color, trailingItem.color]} style={{ height: 39.5 }} />
+               <LinearGradient className="w-1 " colors={[leadingItem.color, trailingItem.color]} style={{ height: 52.7 }} />
             </View>
             <View className="absolute h-full z-50 flex-col-reverse left-[71]">
-               <View className="w-1 bg-darkGray absolute left-0 right-0 bottom-0" style={{ top: PixelRatio.roundToNearestPixel(height * progress) }} />
+               <View className="w-1 bg-darkGray absolute left-0 right-0 bottom-0" style={{ top: height * progress }} />
             </View>
 
             <View className="w-12" />
-            <View className="rounded-lg flex-1 py-2">
-               <Text className="text-xl font-medium text-lightMain/80 text-center">{`${hours > 0 ? `${hours}h ` : ''}${mins}min`}</Text>
+            <View className="rounded-lg flex-1 py-2 my-2">
+               <Text className="text-xl font-medium text-lightMain/90 text-center">{`${hours > 0 ? `${hours}h ` : ''}${mins}min`}</Text>
             </View>
          </View>
       );
@@ -146,7 +145,7 @@ export default function Index() {
                   {new Date() < trailingItem.startDate && 
                      <View className="absolute w-1 left-[71] bg-darkGray" style={{height: 12.3}}/>
                   }
-                  <Text style={{fontSize: 12, lineHeight: 12}} className="font-semibold text-lightMain/80">{trailingItem.startDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</Text>
+                  <Text style={{fontSize: 12, lineHeight: 12}} className="font-semibold text-lightMain/90">{trailingItem.startDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</Text>
                </View>
             )
          } else {
@@ -178,21 +177,35 @@ export default function Index() {
    }
 
    function Section({title, index, tasks}) {
-      const previousTask = tasks.slice(index - 1).find(item => typeof item !== "string")
-      const nextTask = tasks.slice(index + 1).find(item => typeof item !== "string")
 
+      function findPreviousTask(tasks, index) {
+         for (let i = index - 1; i >= 0; i--) {
+            if (typeof tasks[i] !== "string") return tasks[i]
+         }
+         return null
+      }
 
+      function findNextTask(tasks, index) {
+         for (let i = index + 1; i < tasks.length; i++) {
+            if (typeof tasks[i] !== "string") return tasks[i]
+         }
+         return null
+      }
+
+      const previousTask = findPreviousTask(tasks, index)
+      const nextTask = findNextTask(tasks, index)
 
       return (
-         <View className="relative ">
+         <View className="relative flex-row flex-between w-full">
             {previousTask && nextTask && new Date() >= nextTask.startDate && 
                <LinearGradient className="absolute w-1 left-[71] h-full" colors={[previousTask.color, nextTask.color]}/>
             }
             {previousTask && nextTask && new Date() < nextTask.startDate && 
                <View className="absolute w-1 left-[71] h-full bg-darkGray"/>
             }
-            <View className="mt-3 mb-1">
-               <Text className="text-lg text-lightMain/80 font-medium text-center w-full">{title}</Text>
+            <View className="w-12"/>
+            <View className="mt-3 mb-1 flex-1">
+               <Text className="text-lg text-lightMain/90 font-medium text-center ">{title}</Text>
             </View>
          </View>     
       )

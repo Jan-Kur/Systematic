@@ -1,4 +1,4 @@
-import { Link, router } from "expo-router";
+import { Link } from "expo-router";
 import { useState } from "react";
 import { Image, Platform, Text, TextInput, TouchableOpacity, View, useColorScheme, } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -90,7 +90,6 @@ export default function SignIn() {
             className="w-full bg-primary rounded-xl p-2"
             onPress={async () => {
                await signInWithEmail(email, password)
-               router.replace('/');
             }}
          >
             <Text className="text-xl color-darkMain dark:color-lightMain font-semibold text-center">Sign in</Text>

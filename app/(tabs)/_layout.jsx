@@ -1,5 +1,4 @@
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
-import Ionicons from '@expo/vector-icons/Ionicons';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { Redirect, Tabs } from "expo-router";
 import { useColorScheme } from 'react-native';
@@ -49,13 +48,6 @@ export default function TabLayout() {
             options={{
                title: "Timeline",
                tabBarIcon: ({color}) => <MaterialIcons name="timeline" size={28} color={color} />
-            }}
-         />
-         <Tabs.Screen
-            name="statistics"
-            options={{
-               title: "Statistics",
-               tabBarIcon: ({color}) => <Ionicons name="stats-chart" size={28} color={color} />
             }}
          />
       </Tabs>
